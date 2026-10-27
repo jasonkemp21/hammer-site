@@ -7,7 +7,7 @@
 function mindbodySchedule(date) {
   const d = date || dateAfter(gymNow(), 0);
   const mdy = `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`;
-  return `${GYM.mindbody}&date=${encodeURIComponent(mdy)}`;
+  return `${GYM.mindbody}&sDate=${mdy}`;
 }
 /* open in a new tab; if the browser blocks it, go there in this one */
 function openOut(url) {

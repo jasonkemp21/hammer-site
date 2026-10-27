@@ -49,7 +49,8 @@ async function site(route) {
   const u = new URL(route.request().url());
   let p = decodeURIComponent(u.pathname); if (p.endsWith('/')) p += 'index.html';
   if (p === '/config.js') {
-    const body = configMode === 'set' ? `window.HBF_CONFIG = { supabaseUrl: '${SB}/', supabaseAnonKey: 'anon-test' };` : fs.readFileSync(path.join(dist, 'config.js'), 'utf8');
+    // never the real docs/config.js: tests must not reach the live database
+    const body = configMode === 'set' ? `window.HBF_CONFIG = { supabaseUrl: '${SB}/', supabaseAnonKey: 'anon-test' };` : `window.HBF_CONFIG = { supabaseUrl: '', supabaseAnonKey: '' };`;
     return route.fulfill({ status: 200, contentType: 'text/javascript', body });
   }
   const file = path.join(dist, p);
@@ -60,6 +61,7 @@ const opened = [];
 async function setup(ctx) {
   await ctx.route(ORIGIN + '/**', site);
   await ctx.route(SB + '/**', supabase);
+  await ctx.route('https://*.supabase.co/**', (r) => { errors.push('test reached a real Supabase project: ' + r.request().url()); return r.abort(); });
   await ctx.route('https://clients.mindbodyonline.com/**', (r) => { opened.push(r.request().url()); return r.fulfill({ status: 200, contentType: 'text/html', body: '<p>Mindbody stand-in</p>' }); });
 }
 
@@ -98,7 +100,7 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   const bookSel = tag === 'desk' ? '.week button.slot[data-action="book"]' : '.weeklist .bout button[data-action="book"]';
   const [pop] = await Promise.all([ctx.waitForEvent('page'), page.locator(bookSel).first().click()]);
   await pop.waitForLoadState().catch(() => {});
-  check(/clients\.mindbodyonline\.com\/classic\/mainclass\?studioid=744102.*date=10%2F2[67]%2F2026/.test(pop.url()), `${tag}: Book opens the Mindbody schedule on the class date`, pop.url());
+  check(/clients\.mindbodyonline\.com\/classic\/ws\?studioid=744102&stype=-7&sView=week&sDate=10\/2[67]\/2026$/.test(pop.url()), `${tag}: Book opens the Mindbody schedule on the class date`, pop.url());
   await pop.close();
   await page.screenshot({ path: `${out}/${tag}-schedule.png` });
   // Buy on pricing -> Mindbody store

@@ -1638,7 +1638,7 @@ html.is-locked { overflow: hidden; }
       <h2 class="h-s">Where it is kept</h2>
       <p>Messages and requests are stored in a database run for us by Supabase, so our staff can read and answer them. We keep them only as long as we need them to help you. We do not sell or rent your information, and we do not use it for advertising.</p>
       <h2 class="h-s">Booking and payments</h2>
-      <p>Class booking, accounts and payments are handled by Mindbody, Inc. on its own pages, under <a class="link" href="https://www.mindbodyonline.com/privacy-policy" target="_blank" rel="noopener">Mindbody's privacy policy</a>. This site never asks for or stores card details.</p>
+      <p>Class booking, accounts and payments are handled by Mindbody, Inc. on its own pages, under <a class="link" href="https://www.mindbodyonline.com/company/legal/privacy-policy" target="_blank" rel="noopener">Mindbody's privacy policy</a>. This site never asks for or stores card details.</p>
       <h2 class="h-s">Cookies and storage</h2>
       <p>This site does not use advertising or tracking cookies. The round timer remembers your settings in your own browser, and nothing about that leaves your device. Fonts are loaded from Google Fonts, which means Google receives your browser's standard request for them.</p>
       <h2 class="h-s">Your choices</h2>
@@ -1737,7 +1737,8 @@ const GYM = {
   tz: 'America/Chicago',
   maps: 'https://www.google.com/maps/dir/?api=1&destination=525+W+North+Ave%2C+Chicago%2C+IL+60610',
   // Mindbody, where booking, accounts and payments happen (studio 744102)
-  mindbody: 'https://clients.mindbodyonline.com/classic/mainclass?studioid=744102&stype=-7&view=week&loc=1',
+  // always enter through /classic/ws: it starts Mindbody's session. Deep /mainclass links show an empty week
+  mindbody: 'https://clients.mindbodyonline.com/classic/ws?studioid=744102&stype=-7&sView=week',
   store: 'https://clients.mindbodyonline.com/classic/ws?studioid=744102&stype=40',
   site: 'https://www.hammerfitnessandboxing.com',
   instagram: 'https://instagram.com/hammerfitnessandboxing',
@@ -2169,7 +2170,7 @@ const actions = {
 function mindbodySchedule(date) {
   const d = date || dateAfter(gymNow(), 0);
   const mdy = `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`;
-  return `${GYM.mindbody}&date=${encodeURIComponent(mdy)}`;
+  return `${GYM.mindbody}&sDate=${mdy}`;
 }
 /* open in a new tab; if the browser blocks it, go there in this one */
 function openOut(url) {

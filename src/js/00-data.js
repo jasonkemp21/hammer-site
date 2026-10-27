@@ -16,7 +16,8 @@ const GYM = {
   tz: 'America/Chicago',
   maps: 'https://www.google.com/maps/dir/?api=1&destination=525+W+North+Ave%2C+Chicago%2C+IL+60610',
   // Mindbody, where booking, accounts and payments happen (studio 744102)
-  mindbody: 'https://clients.mindbodyonline.com/classic/mainclass?studioid=744102&stype=-7&view=week&loc=1',
+  // always enter through /classic/ws: it starts Mindbody's session. Deep /mainclass links show an empty week
+  mindbody: 'https://clients.mindbodyonline.com/classic/ws?studioid=744102&stype=-7&sView=week',
   store: 'https://clients.mindbodyonline.com/classic/ws?studioid=744102&stype=40',
   site: 'https://www.hammerfitnessandboxing.com',
   instagram: 'https://instagram.com/hammerfitnessandboxing',
