@@ -25,7 +25,7 @@ function boutRow(c, nextKey) {
     <div class="bout__time">${ck.h}:${pad2(ck.m)}<small>${ck.ap}</small></div>
     <div class="bout__what">
       <h3 class="bout__name">${esc(c.type.name)}</h3>
-      <div class="bout__meta"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>${c.type.bookable ? `<span>${c.mins || c.type.mins} min</span>` : ''}${c.type.level ? `<span>${esc(c.type.level)}</span>` : ''}</div>
+      <div class="bout__meta"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>${c.type.bookable ? `<span>${c.mins || c.type.mins} min</span>` : ''}${c.type.level ? `<span>${esc(c.type.level)}</span>` : ''}${c.spots === 0 ? '<span class="spots spots--full">Full, waitlist on Mindbody</span>' : c.spots != null && c.spots <= 4 && !c.past ? `<span class="spots">${c.spots} ${c.spots === 1 ? 'spot' : 'spots'} left</span>` : ''}</div>
     </div>
     ${coachCell(c)}
     <div class="bout__cta">${boutCta(c)}</div>
@@ -101,7 +101,7 @@ function renderStatus() {
 /* ----- schedule page ----- */
 function scheduleNote() {
   const el = $('[data-sched-note]'); if (!el) return;
-  if (SCHED) { const when = new Intl.DateTimeFormat('en-US', { timeZone: GYM.tz, weekday: 'long', hour: 'numeric', minute: '2-digit' }).format(SCHED.fetched); el.innerHTML = `Times and coaches come from the gym's Mindbody calendar and refresh every morning. Last checked ${esc(when)}. Kids Boxing and Saturday sparring are reserved through the front desk. <a class="link" href="${GYM.mindbody}" target="_blank" rel="noopener">Open the Mindbody schedule</a>`; }
+  if (SCHED) { const when = new Intl.DateTimeFormat('en-US', { timeZone: GYM.tz, weekday: 'long', hour: 'numeric', minute: '2-digit' }).format(SCHED.fetched); el.innerHTML = `This week's times and coaches come from the gym's Mindbody calendar and refresh every morning (last checked ${esc(when)}). Days further out show the usual schedule. Muay Thai, Kids Boxing and sparring are as the gym posts them. <a class="link" href="${GYM.mindbody}" target="_blank" rel="noopener">Open the Mindbody schedule</a>`; }
   else el.textContent = 'Times and coaches as posted by the gym. Kids Boxing and Saturday sparring are reserved through the front desk.';
 }
 function renderSchedule() {
@@ -140,9 +140,9 @@ function slotCard(c, nextKey) {
   const booked = state.bookings[c.key];
   const cls = `slot slot--${c.type.tag} ${c.past ? 'is-past' : ''} ${booked ? 'is-booked' : ''} ${nextKey === c.key ? 'is-next' : ''}`;
   const inner = `<span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>
-    <b class="slot__name">${esc(c.type.name)}</b>
+    <b class="slot__name">${esc(c.type.name)}</b>${c.spots != null && c.spots > 0 && c.spots <= 4 && !c.past ? `<span class="slot__spots">${c.spots} left</span>` : ''}
     <span class="slot__coach">${c.coach ? esc(c.coach.name) : esc((c.type.noCoach || ['Hammer coaches'])[0])}</span>
-    <span class="slot__cta">${c.cancelled ? 'Cancelled' : c.past === true ? 'Final bell' : c.past === 'live' ? 'Under way' : booked ? icon('check') + ' Booked' : c.type.bookable ? 'Book ' + icon('go', 'i--go') : c.type.askLabel}</span>`;
+    <span class="slot__cta">${c.cancelled ? 'Cancelled' : c.spots === 0 && !c.past ? 'Full' : c.past === true ? 'Final bell' : c.past === 'live' ? 'Under way' : booked ? icon('check') + ' Booked' : c.type.bookable ? 'Book ' + icon('go', 'i--go') : c.type.askLabel}</span>`;
   if (c.past || c.cancelled) return `<div class="${cls} ${c.cancelled ? 'is-past' : ''}">${inner}</div>`;
   if (!c.type.bookable) return `<button class="${cls}" type="button" data-action="inquire" data-kind="${c.type.ask}">${inner}</button>`;
   return `<button class="${cls}" type="button" data-action="book" data-class="${c.key}">${inner}</button>`;

@@ -45,9 +45,20 @@ async function supabase(route) {
   return route.fulfill({ status: 404, headers: cors, body: '{}' });
 }
 let configMode = 'set';
+// a fixed schedule from the Mindbody widget, as the daily job writes it: Mon Oct 26 is 'today' in the tests
+const FIXTURE = { source: 'mindbody-widget', fetched: '2026-10-26T10:15:00.000Z', from: '2026-10-26', to: '2026-11-01', types: ['Boxing', 'Hammer Hip House Boxing'], classes: [
+  { date: '2026-10-26', start: '17:00', mins: 60, name: 'Boxing', coach: 'teijon Price', regular: null, cancelled: false, spots: 2, bookable: true },
+  { date: '2026-10-26', start: '18:00', mins: 60, name: 'Boxing', coach: 'Sam Smith', regular: null, cancelled: false, spots: 15, bookable: true },
+  { date: '2026-10-27', start: '07:00', mins: 60, name: 'Boxing', coach: 'teijon Price', regular: null, cancelled: false, spots: 13, bookable: true },
+  { date: '2026-10-27', start: '12:00', mins: 60, name: 'Hammer Hip House Boxing', coach: 'Johnny Higgins', regular: null, cancelled: false, spots: 10, bookable: true },
+  { date: '2026-10-27', start: '17:00', mins: 60, name: 'Boxing', coach: 'JJ Higgins', regular: null, cancelled: true, spots: 15, bookable: true },
+  { date: '2026-10-27', start: '18:00', mins: 60, name: 'Boxing', coach: 'JJ Higgins', regular: null, cancelled: false, spots: 0, bookable: true },
+  { date: '2026-10-29', start: '20:00', mins: 45, name: 'Open Ring Night', coach: 'Johnny Higgins', regular: null, cancelled: false, spots: 8, bookable: true },
+] };
 async function site(route) {
   const u = new URL(route.request().url());
   let p = decodeURIComponent(u.pathname); if (p.endsWith('/')) p += 'index.html';
+  if (p === '/schedule.json') return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FIXTURE) });
   if (p === '/config.js') {
     // never the real docs/config.js: tests must not reach the live database
     const body = configMode === 'set' ? `window.HBF_CONFIG = { supabaseUrl: '${SB}/', supabaseAnonKey: 'anon-test' };` : `window.HBF_CONFIG = { supabaseUrl: '', supabaseAnonKey: '' };`;
@@ -104,17 +115,21 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   await page.screenshot({ path: `${out}/${tag}-book-ways.png` });
   const [pop] = await Promise.all([ctx.waitForEvent('page'), page.click('[data-action="rv-mindbody"]')]);
   await pop.waitForLoadState().catch(() => {});
-  check(/clients\.mindbodyonline\.com\/classic\/ws\?studioid=744102&stype=-7&sView=week&sDate=10\/2[67]\/2026$/.test(pop.url()), `${tag}: Mindbody way opens the schedule on the class date`, pop.url());
+  check(/clients\.mindbodyonline\.com\/classic\/ws\?studioid=744102&stype=-7&sView=week&sDate=10\/2[6-9]\/2026$/.test(pop.url()), `${tag}: Mindbody way opens the schedule on the class date`, pop.url());
   await pop.close();
   check(await page.locator('[data-ov="book"]:not([hidden])').count() === 0, `${tag}: sheet closes after handing off to Mindbody`);
   await page.screenshot({ path: `${out}/${tag}-schedule.png` });
   if (tag === 'desk') {
     const note = await page.locator('[data-sched-note]').innerText();
-    check(/refresh every morning/.test(note) && /Last checked/.test(note), 'schedule note says it comes from Mindbody and when it was checked');
-    const mon5 = await page.locator('.week .week__cell.is-today .slot', { hasText: 'Boxing' }).first().innerText();
-    check(/Teijon/.test(mon5), 'live schedule shows the substitute coach from Mindbody for Monday 5 PM', mon5.replace(/\s+/g, ' '));
-    const covering = (await page.locator('.weeklist .bout').evaluateAll((els) => els.map((e) => e.textContent))).find((t) => /Teijon/.test(t) && /5:00/.test(t)) || '';
-    check(/Covering for JJ Higgins/.test(covering), 'the day list marks a substitute as covering for the regular coach', covering.replace(/\s+/g, ' '));
+    check(/refresh every morning/.test(note) && /last checked/.test(note), 'schedule note says it comes from Mindbody and when it was checked');
+    const cell = (sel) => page.locator(sel).evaluateAll((els) => els.map((e) => e.textContent.replace(/\s+/g, ' ')));
+    const today = await cell('.week .week__cell.is-today .slot');
+    check(today.some((t) => /Final bell/i.test(t)) && today.some((t) => /Teijon/.test(t) && /2 left/.test(t)) && today.some((t) => /Sam Smith/.test(t)), 'today keeps its finished classes and shows live coaches and spots left', today.join(' || '));
+    const tue = await page.locator('.week .week__cell').evaluateAll((els) => els.filter((e, i) => i % 7 === 1).flatMap((e) => [...e.querySelectorAll('.slot')].map((x) => x.textContent.replace(/\s+/g, ' '))));
+    check(tue.some((t) => /Cancelled/.test(t)) && tue.some((t) => /Full/.test(t)) && tue.some((t) => /Muay Thai/i.test(t)), 'cancelled and full classes are marked; Muay Thai (not in the widget) still comes from the usual schedule', tue.join(' || '));
+    check(await page.locator('.week .slot', { hasText: 'Open Ring Night' }).count() === 1 && await page.locator('.week__time', { hasText: '8 PM' }).count() === 1, 'a class the site never heard of gets its own row and card');
+    const dayBouts = await cell('.weeklist .bout');
+    check(dayBouts.some((t) => /Sam Smith/.test(t) && /Coach/.test(t)), 'a coach the site does not know is shown by name');
     check(await page.locator('.week .slot--kids').count() === 3 && await page.locator('.week .slot--sparring').count() === 1, 'Kids Boxing and sparring (not on Mindbody) still appear alongside the live classes');
   }
 

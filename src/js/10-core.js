@@ -37,9 +37,10 @@ function duration(totalSecs) {
   return { d, h, m, s: sec, hms: `${pad2(d * 24 + h)}:${pad2(m)}:${pad2(sec)}`, words: d ? `${d}d ${h}h` : h ? `${h}h ${pad2(m)}m` : m ? `${m} min` : `${sec} sec` };
 }
 
-/* ---------- the live schedule: docs/schedule.json, read from Mindbody every morning ----------
-   Dates it covers come from Mindbody. Dates it does not cover fall back to the typed weekly pattern (WEEK).
-   Classes the gym runs outside Mindbody (Kids Boxing, sparring) are site-only and always come from the pattern. */
+/* ---------- the live schedule: docs/schedule.json, read from the gym's Mindbody widget every morning ----------
+   It covers the current calendar week and only the class types the gym put in the widget. So, per day:
+   days it covers use it; later days use the typed weekly pattern (WEEK); class types it never lists (today, Muay Thai)
+   and site-only classes (Kids Boxing, sparring) always come from the pattern; today's classes that already ran stay greyed. */
 let SCHED = null; // { fetched: Date, byDate: { 'YYYY-MM-DD': [entry] } }
 const CLASS_NAME_TO_TYPE = { 'boxing': 'boxing', 'hammer hip house boxing': 'lunch', 'lunch-time boxing': 'lunch', 'muay thai': 'muaythai', 'kids boxing': 'kids', 'sparring': 'sparring' };
 function liveType(name, mins) {
@@ -59,13 +60,14 @@ function liveCoach(name) {
 }
 function setLiveSchedule(data) {
   if (!data || !Array.isArray(data.classes) || !data.classes.length) { SCHED = null; return; }
-  const byDate = {};
+  const byDate = {}; const types = {};
   data.classes.forEach((c) => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(c.date || ''); const hm = /^(\d{2}):(\d{2})$/.exec(c.start || ''); if (!m || !hm) return;
     const type = liveType(c.name || 'Class', c.mins);
-    (byDate[c.date] = byDate[c.date] || []).push({ t: +hm[1] * 60 + +hm[2], type, mins: c.mins || type.mins, coach: liveCoach(c.coach), sub: c.regular || null, cancelled: !!c.cancelled });
+    types[type.id] = true;
+    (byDate[c.date] = byDate[c.date] || []).push({ t: +hm[1] * 60 + +hm[2], type, mins: c.mins || type.mins, coach: liveCoach(c.coach), sub: c.regular || null, cancelled: !!c.cancelled, spots: typeof c.spots === 'number' ? c.spots : null });
   });
-  SCHED = { fetched: new Date(data.fetched || 0), from: data.from, to: data.to, byDate };
+  SCHED = { fetched: new Date(data.fetched || 0), from: data.from, to: data.to, byDate, types, covers: (d) => data.from && data.to ? d >= data.from && d <= data.to : !!byDate[d] };
 }
 const dateKey = (d) => `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
 
@@ -76,14 +78,18 @@ function buildWeek() {
   for (let n = 0; n < 7; n++) {
     const date = dateAfter(now, n);
     const day = (now.day + n) % 7;
-    const live = SCHED && SCHED.byDate[dateKey(date)];
-    const pattern = WEEK.filter((c) => c.day === day).filter((c) => !live || CLASS_TYPES[c.type].siteOnly)
-      .map((c) => ({ t: c.t, type: CLASS_TYPES[c.type], mins: CLASS_TYPES[c.type].mins, coach: c.coach ? COACHES[c.coach] : null, sub: null, cancelled: false }));
+    const dk = dateKey(date); const covered = !!(SCHED && SCHED.covers(dk)); const live = covered ? (SCHED.byDate[dk] || []) : null;
+    const pattern = WEEK.filter((c) => c.day === day).filter((c) => {
+      if (!covered) return true; const type = CLASS_TYPES[c.type];
+      if (type.siteOnly || !SCHED.types[type.id]) return true; // not something the widget lists
+      const started = n === 0 && c.t <= now.mins; // earlier today: the widget drops classes once they start
+      return started && !live.some((l) => l.t === c.t && l.type.id === type.id);
+    }).map((c) => ({ t: c.t, type: CLASS_TYPES[c.type], mins: CLASS_TYPES[c.type].mins, coach: c.coach ? COACHES[c.coach] : null, sub: null, cancelled: false, spots: null }));
     const used = {};
     const classes = (live || []).concat(pattern).map((c) => {
       const startsIn = (n * 1440 + c.t - now.mins) * 60 - now.secs;
       let key = `${ymd(date)}-${c.t}-${c.type.id}`; if (used[key]) key += '-' + (used[key] + 1); used[key.split('-').slice(0, 3).join('-')] = (used[key.split('-').slice(0, 3).join('-')] || 0) + 1;
-      return { key, n, day, date, t: c.t, type: c.type, mins: c.mins, coach: c.coach, sub: c.sub, cancelled: c.cancelled, live: !!live, startsIn, past: startsIn <= -c.mins * 60 ? true : startsIn <= 0 ? 'live' : false };
+      return { key, n, day, date, t: c.t, type: c.type, mins: c.mins, coach: c.coach, sub: c.sub, cancelled: c.cancelled, spots: c.spots, live: !!live, startsIn, past: startsIn <= -c.mins * 60 ? true : startsIn <= 0 ? 'live' : false };
     }).sort((a, b) => a.t - b.t || (a.type.id === 'boxing' ? -1 : 1));
     days.push({ n, day, date, classes, hours: GYM.hours[day], live: !!live });
   }

@@ -21,12 +21,10 @@ How the site works:
 
 ## The live schedule
 
-- **When it runs:** every day at 5:15 AM Chicago time, and whenever you press **Actions → Refresh class schedule from Mindbody → Run workflow**. A change in Mindbody shows on the site after the next run.
-- **What it reads:** the gym's public Mindbody class page for the current and next calendar week (today through 7 to 13 days ahead), the same page a client sees. No login, no API key. It only reads; nothing is written to Mindbody.
-- **If it fails:** the job shows a red X on the Actions tab, nothing is committed, and the site keeps the last good schedule. Days beyond what was fetched fall back to the typed pattern. The schedule page says when the schedule was last checked. Mindbody sits behind Cloudflare and may one day refuse automated readers; if the job starts failing every day, the sturdier route is Mindbody's official API, which needs an approved developer account and the owner's activation.
-- **Pages redeploys** on each schedule commit, so the live site updates within a couple of minutes of the job.
-
----
+- **When it runs:** every day at 5:15 AM Chicago time, and whenever you press **Actions → Refresh class schedule from Mindbody → Run workflow**. A change in Mindbody shows on the site after the next run, usually within a few minutes of it.
+- **What it reads:** the gym's own Mindbody schedule widget (the one embedded on the old site, id `b667859216f`). The widget's page carries this calendar week's classes: name, time, coach, cancellations and spots left. It only reads; nothing is written to Mindbody, and no login or key is needed.
+- **What the widget doesn't include:** it covers Monday to Sunday of the current week, and only the class types the gym chose when they set it up. Today that's Boxing and Hammer Hip House Boxing; Muay Thai is not in it. For those gaps the site uses the typed weekly schedule in `src/js/00-data.js`: days after this Sunday, Muay Thai, Kids Boxing and sparring. **Ask the gym to edit the widget in Mindbody (Branded Web manager) to show all class types**, or to make a second schedule widget that does and give you its id, then change `WIDGET_ID` in `scripts/fetch-schedule.mjs`. After that, Muay Thai is live too.
+- **If it fails:** the job shows a red X on the Actions tab, nothing is committed, and the site keeps the last good schedule. The schedule page says when the schedule was last checked. Days beyond what was fetched show the usual schedule.
 
 ## 0. Confirm with the gym before launch
 
@@ -109,4 +107,4 @@ node build.mjs
 
 This rebuilds `docs/` and keeps the Supabase settings already in `docs/config.js`. Commit and push, and Pages updates in about a minute. Node 18 or newer, no installs needed.
 
-To test the build: `node test/live-site.mjs` runs 59 checks against stand-ins for Supabase and Mindbody. It needs Playwright.
+To test the build: `node test/live-site.mjs` runs 66 checks against stand-ins for Supabase and Mindbody. It needs Playwright.

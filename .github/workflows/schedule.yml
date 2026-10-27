@@ -21,8 +21,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install Playwright
-        run: npm install --no-save playwright@1.49.1 && npx playwright install --with-deps chromium
       - name: Read the Mindbody schedule
         run: node scripts/fetch-schedule.mjs docs/schedule.json
       - name: Commit if it changed
