@@ -2,7 +2,7 @@
 //   docs/index.html        the whole site, one page
 //   docs/admin/index.html  the staff page for website requests
 //   docs/config.js         Supabase settings, edited after deploy without a rebuild
-//   plus 404 forwarding, robots.txt, sitemap.xml, CNAME, icons and only the images the site uses
+//   plus 404 forwarding, robots.txt, sitemap.xml, icons and only the images the site uses
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -44,6 +44,9 @@ const dist = path.join(root, 'docs');
 // keep Supabase settings already pasted into docs/config.js across rebuilds
 const liveConfig = path.join(dist, 'config.js');
 const keptConfig = fs.existsSync(liveConfig) && /supabaseUrl:\s*'https?:/.test(fs.readFileSync(liveConfig, 'utf8')) ? fs.readFileSync(liveConfig, 'utf8') : null;
+// keep the custom domain GitHub writes to docs/CNAME when it is set in Settings > Pages
+const cnameFile = path.join(dist, 'CNAME');
+const keptCname = fs.existsSync(cnameFile) ? fs.readFileSync(cnameFile, 'utf8') : null;
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(path.join(dist, 'img'), { recursive: true });
 fs.mkdirSync(path.join(dist, 'admin'), { recursive: true });
@@ -51,6 +54,7 @@ fs.writeFileSync(path.join(dist, 'index.html'), page);
 fs.copyFileSync(path.join(root, 'src/admin.html'), path.join(dist, 'admin/index.html'));
 for (const f of fs.readdirSync(path.join(root, 'static'))) fs.copyFileSync(path.join(root, 'static', f), path.join(dist, f));
 if (keptConfig) fs.writeFileSync(liveConfig, keptConfig);
+if (keptCname) fs.writeFileSync(cnameFile, keptCname);
 for (const f of ['favicon.png', 'apple-touch-icon.png']) fs.copyFileSync(path.join(root, 'assets', f), path.join(dist, f));
 fs.copyFileSync(path.join(root, 'assets/og.jpg'), path.join(dist, 'img/og.jpg'));
 // only images the page actually names

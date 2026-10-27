@@ -63,7 +63,7 @@ On the free plan, Supabase may pause a project that has had no activity for a wh
 
 Do this when you're ready to switch. The old Squarespace site goes dark for anyone whose browser picks up the change.
 
-1. **Add the domain on GitHub first.** In **Settings → Pages → Custom domain**, enter `www.hammerfitnessandboxing.com` and click Save. GitHub warns that setting DNS before this step lets someone else claim the domain. GitHub also recommends verifying the domain under your account's **Settings → Pages → Add a domain**.
+1. **Add the domain on GitHub first.** In **Settings → Pages → Custom domain**, enter `www.hammerfitnessandboxing.com` and click Save. GitHub saves it as `docs/CNAME`, and `node build.mjs` keeps that file. Until then the site previews at `jasonkemp21.github.io/hammer-site/`. GitHub warns that setting DNS before this step lets someone else claim the domain. GitHub also recommends verifying the domain under your account's **Settings → Pages → Add a domain**.
 2. In GoDaddy, open the domain's **DNS** page. If the nameservers aren't GoDaddy's, the DNS is managed elsewhere (possibly Squarespace), so make the changes there instead.
 3. Change only these records:
 
