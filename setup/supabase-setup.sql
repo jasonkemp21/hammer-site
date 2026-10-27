@@ -9,7 +9,7 @@ create table if not exists public.admins (
 alter table public.admins enable row level security;  -- no policies: only you, in the dashboard, can see or change this list
 
 insert into public.admins (email) values
-  ('info@hammerfitnessandboxing.com')            -- change or add staff emails here
+  ('jasonjkemp@gmail.com')            -- change or add staff emails here
 on conflict do nothing;
 
 -- true when the signed-in user's email is on the staff list
