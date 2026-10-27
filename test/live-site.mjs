@@ -95,18 +95,24 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   pass(`${tag}: all 10 views render without sideways scroll`);
   await page.screenshot({ path: `${out}/${tag}-home.png` });
 
-  // Book a class -> Mindbody on that class's date
+  // Book a class -> sheet with two ways; Mindbody way opens the class date
   await page.evaluate(() => { location.hash = 'schedule'; }); await page.waitForTimeout(300);
   const bookSel = tag === 'desk' ? '.week button.slot[data-action="book"]' : '.weeklist .bout button[data-action="book"]';
-  const [pop] = await Promise.all([ctx.waitForEvent('page'), page.locator(bookSel).first().click()]);
+  await page.locator(bookSel).first().click(); await page.waitForTimeout(300);
+  check(await page.locator('[data-ov="book"]:not([hidden]) .way').count() === 2, `${tag}: Book opens a sheet with two ways`);
+  await page.screenshot({ path: `${out}/${tag}-book-ways.png` });
+  const [pop] = await Promise.all([ctx.waitForEvent('page'), page.click('[data-action="rv-mindbody"]')]);
   await pop.waitForLoadState().catch(() => {});
-  check(/clients\.mindbodyonline\.com\/classic\/ws\?studioid=744102&stype=-7&sView=week&sDate=10\/2[67]\/2026$/.test(pop.url()), `${tag}: Book opens the Mindbody schedule on the class date`, pop.url());
+  check(/clients\.mindbodyonline\.com\/classic\/ws\?studioid=744102&stype=-7&sView=week&sDate=10\/2[67]\/2026$/.test(pop.url()), `${tag}: Mindbody way opens the schedule on the class date`, pop.url());
   await pop.close();
+  check(await page.locator('[data-ov="book"]:not([hidden])').count() === 0, `${tag}: sheet closes after handing off to Mindbody`);
   await page.screenshot({ path: `${out}/${tag}-schedule.png` });
-  // Buy on pricing -> Mindbody store
+  // Buy on pricing -> sheet; Mindbody way opens the store
   await page.evaluate(() => { location.hash = 'pricing'; }); await page.waitForTimeout(300);
-  const [pop2] = await Promise.all([ctx.waitForEvent('page'), page.locator('.pass button[data-action="buy"]').nth(1).click()]);
-  check(/stype=40/.test(pop2.url()), `${tag}: Buy opens the Mindbody online store`, pop2.url()); await pop2.close();
+  await page.locator('.pass button[data-action="buy"][data-item="unlimited"]').click(); await page.waitForTimeout(300);
+  check(/Group Boxing Unlimited/.test(await page.locator('[data-ov="book"] .recap').textContent()), `${tag}: Buy sheet names the pass`);
+  const [pop2] = await Promise.all([ctx.waitForEvent('page'), page.click('[data-action="rv-mindbody"]')]);
+  check(/stype=40/.test(pop2.url()), `${tag}: Mindbody way opens the online store`, pop2.url()); await pop2.close();
   await page.screenshot({ path: `${out}/${tag}-pricing.png`, fullPage: false });
   // shop is a catalog
   await page.evaluate(() => { location.hash = 'shop'; }); await page.waitForTimeout(300);
@@ -114,6 +120,41 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   await page.screenshot({ path: `${out}/${tag}-shop.png` });
 
   if (tag === 'desk') {
+    // reserve a class, pay at the gym
+    await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(300);
+    await page.click('.head__book'); await page.waitForTimeout(300);
+    check(await page.locator('input[name="rv-class"]').count() > 0, 'header Book with no class picked shows the class picker');
+    await page.locator('input[name="rv-class"]').nth(1).check(); await page.click('[data-action="rv-how"]'); await page.waitForTimeout(200);
+    await page.click('[data-action="rv-form"]'); await page.waitForTimeout(200);
+    await page.click('[data-action="rv-send"]'); await page.waitForTimeout(200);
+    check(await page.locator('[data-ov="book"] .has-error').count() >= 3, 'empty reservation form shows errors instead of sending');
+    await page.fill('#rv-fn', 'Maya'); await page.fill('#rv-ln', 'Ortiz'); await page.fill('#rv-em', 'maya@example.com'); await page.fill('#rv-ph', '773 555 0199');
+    await page.selectOption('#rv-pass', 'intro'); await page.check('#rv-first'); await page.check('#rv-rental');
+    await page.waitForTimeout(2600);
+    await page.click('[data-action="rv-send"]'); await page.waitForTimeout(500);
+    const bk = db.inserts[db.inserts.length - 1];
+    check(bk && bk.kind === 'booking' && bk.name === 'Maya Ortiz' && bk.phone === '773 555 0199' && /Boxing/.test(bk.details.class) && /Oct 2[67]/.test(bk.details.when) && /3 classes/.test(bk.details.pass) && bk.details.first_time === 'Yes' && /Yes/.test(bk.details.rental) && bk.details.pay === 'At the gym', 'class reservation saves class, time, pass and extras', JSON.stringify(bk));
+    check(/on the card, Maya/.test(await page.locator('#book-title').textContent()) && await page.locator('[data-ov="book"] a[href*="calendar.google.com"]').count() === 1, 'reservation confirms with a calendar link');
+    await page.screenshot({ path: `${out}/reserve-done.png` });
+    await page.click('[data-ov="book"] [data-action="overlay-close"]');
+    // reserve a pass, pay at the gym, with a first class
+    await page.evaluate(() => { location.hash = 'pricing'; }); await page.waitForTimeout(300);
+    await page.locator('.pass button[data-action="buy"][data-item="pack10"]').click(); await page.waitForTimeout(200);
+    await page.click('[data-action="rv-form"]'); await page.waitForTimeout(200);
+    await page.fill('#rv-fn', 'Leo'); await page.fill('#rv-ln', 'Park'); await page.fill('#rv-em', 'leo@example.com'); await page.fill('#rv-ph', '3125550123');
+    await page.selectOption('#rv-first-class', { index: 1 });
+    await page.click('[data-action="rv-send"]'); await page.waitForTimeout(500);
+    const pu = db.inserts[db.inserts.length - 1];
+    check(pu && pu.kind === 'purchase' && pu.details.item === '10-class pack' && pu.details.price === '$250' && /Boxing/.test(pu.details.first_class), 'pass reservation saves the pass, price and first class', JSON.stringify(pu));
+    await page.click('[data-ov="book"] [data-action="overlay-close"]');
+    // the database refuses (rules not updated yet): honest failure
+    db.mode = 'down';
+    await page.locator('.pass button[data-action="buy"][data-item="unlimited"]').click(); await page.waitForTimeout(200);
+    await page.click('[data-action="rv-form"]'); await page.waitForTimeout(200);
+    await page.fill('#rv-fn', 'Ana'); await page.fill('#rv-ln', 'Diaz'); await page.fill('#rv-em', 'ana@example.com'); await page.fill('#rv-ph', '3125550100');
+    await page.click('[data-action="rv-send"]'); await page.waitForTimeout(500);
+    check(await page.locator('[data-ov="book"] .form-fail').count() === 1 && await page.inputValue('#rv-fn') === 'Ana', 'a refused reservation shows call-or-email and keeps the form');
+    db.mode = 'ok'; await page.click('[data-ov="book"] [data-action="overlay-close"]');
     // contact form, success
     await page.evaluate(() => { location.hash = 'visit'; }); await page.waitForTimeout(300);
     await page.fill('#ct-name', 'Pat Lee'); await page.fill('#ct-email', 'pat@example.com'); await page.fill('#ct-phone', '312 555 0101');
@@ -186,7 +227,11 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   check(/do not match/.test(await page.locator('[data-login-error]').innerText()), 'wrong password is refused with a clear message');
   await page.fill('#pw', STAFF.password); await page.click('[data-login-btn]'); await page.waitForTimeout(600);
   const cards = await page.locator('.req').count();
-  check(cards === db.rows.filter((r) => r.status === 'new').length && cards >= 3, `admin lists the new requests (${cards})`);
+  check(cards === db.rows.filter((r) => r.status === 'new').length && cards >= 5, `admin lists the new requests (${cards})`);
+  check(await page.locator('.req', { hasText: 'Maya Ortiz' }).locator('.pill--booking').count() === 1 && /When:/.test(await page.locator('.req', { hasText: 'Maya Ortiz' }).innerText()), 'class reservation shows as a reservation with its time');
+  await page.selectOption('[data-kind-filter]', 'booking'); await page.waitForTimeout(150);
+  check(await page.locator('.req').count() === 1, 'type filter narrows to class reservations');
+  await page.selectOption('[data-kind-filter]', 'all'); await page.waitForTimeout(150);
   check(await page.locator('.req', { hasText: 'Dana Ruiz' }).locator('.pill--kids').count() === 1, 'Kids Boxing requests are labelled');
   await page.screenshot({ path: `${out}/admin-list.png`, fullPage: true });
   await page.locator('.req', { hasText: 'Pat Lee' }).locator('[data-toggle]').click(); await page.waitForTimeout(400);

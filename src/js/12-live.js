@@ -1,6 +1,6 @@
 /* ---------- the live site's two outside services ----------
-   Mindbody: booking, accounts and payments. Every Book and Buy button opens the gym's Mindbody pages.
-   Supabase: messages and session requests from the forms, read by staff at /admin.
+   Mindbody: booking, accounts and payments. Every Book and Buy button offers it (see 35-reserve.js).
+   Supabase: messages, session requests and pay-at-the-gym reservations from the forms, read by staff at /admin.
    Keys come from config.js (window.HBF_CONFIG), so they can change without a rebuild. */
 
 /* the Mindbody week view, opened on the date of the class when there is one */
@@ -15,23 +15,6 @@ function openOut(url) {
   try { w = window.open(url, '_blank'); } catch (e) { w = null; }
   if (w) { try { w.opener = null; } catch (e) { /* cross-origin */ } } else { location.href = url; }
 }
-
-Object.assign(actions, {
-  /* Book: the class's day on Mindbody, or this week when no class was picked */
-  'book': (el) => {
-    const key = el && el.dataset.class; const type = el && el.dataset.type;
-    let c = key ? findClass(key) : null;
-    if (!c && type) c = nextClass(buildWeek(), (x) => x.type.id === type);
-    if ($('#menu') && !$('#menu').hidden) actions['menu-close'](true);
-    openOut(mindbodySchedule(c ? c.date : null));
-  },
-  /* Buy a pass, membership or package: the gym's Mindbody online store */
-  'buy': () => {
-    if ($('#menu') && !$('#menu').hidden) actions['menu-close'](true);
-    if (Overlay.current) Overlay.close(true);
-    openOut(GYM.store);
-  },
-});
 
 /* ---------- requests: save to Supabase, or say plainly that it did not go ---------- */
 const LIVE = (() => { const c = window.HBF_CONFIG || {}; return { url: (c.supabaseUrl || '').replace(/\/+$/, ''), key: c.supabaseAnonKey || '' }; })();

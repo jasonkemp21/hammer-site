@@ -107,14 +107,14 @@ function quizResult() {
     pass = { label: `${n}-session pack`, price: money(m.list), action: 'inquire', kind };
     passWhy = `${money(Math.round(m.list / n))} a session instead of ${money(m.single)}. First-time clients take 25% off.`;
   } else if (a.style === 'own') {
-    pass = { label: 'Gym Access', price: '$100 a month', action: 'buy' }; passWhy = 'Come in during open hours and train at your own pace.';
+    pass = { label: 'Gym Access', price: '$100 a month', action: 'buy', item: 'access' }; passWhy = 'Come in during open hours and train at your own pace.';
   } else if (a.goal === 'compete' && freq >= 3) {
-    pass = { label: 'Unlimited Hammer', price: '$275 a month', action: 'buy' }; passWhy = 'Unlimited classes, general access and a specialty skill session every month.';
+    pass = { label: 'Unlimited Hammer', price: '$275 a month', action: 'buy', item: 'hammer' }; passWhy = 'Unlimited classes, general access and a specialty skill session every month.';
   } else if (freq >= 2) {
     const per = 150 / (freq * MONTH);
-    pass = { label: 'Group Boxing Unlimited', price: '$150 a month', action: 'buy' }; passWhy = `At ${freq === 4 ? 'four or more' : freq === 3 ? 'three' : 'two'} classes a week that is about ${money(Math.round(per * 100) / 100)} a class.`;
+    pass = { label: 'Group Boxing Unlimited', price: '$150 a month', action: 'buy', item: 'unlimited' }; passWhy = `At ${freq === 4 ? 'four or more' : freq === 3 ? 'three' : 'two'} classes a week that is about ${money(Math.round(per * 100) / 100)} a class.`;
   } else {
-    pass = { label: '10-class pack', price: '$250', action: 'buy' }; passWhy = 'At once a week that is $25 a class, and one pack lasts about ten weeks.';
+    pass = { label: '10-class pack', price: '$250', action: 'buy', item: 'pack10' }; passWhy = 'At once a week that is $25 a class, and one pack lasts about ten weeks.';
   }
   return { prog, why, nx, pass, passWhy, typeId, compete: a.goal === 'compete' };
 }
@@ -145,7 +145,7 @@ function renderQuiz() {
     <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="quiz-restart">Start over</button>
       ${r.nx ? `<button class="btn btn--primary" type="button" data-action="book" data-class="${r.nx.key}">Book this class ${icon('go', 'i--go')}</button>`
         : r.pass.action === 'inquire' ? `<button class="btn btn--primary" type="button" data-action="inquire" data-kind="${r.pass.kind}">Request a session</button>`
-          : `<button class="btn btn--primary" type="button" data-action="buy">Get ${esc(r.pass.label)} on Mindbody</button>`}</footer>`;
+          : `<button class="btn btn--primary" type="button" data-action="buy" data-item="${r.pass.item}">Get ${esc(r.pass.label)}</button>`}</footer>`;
 }
 Object.assign(actions, {
   'quiz-open': () => { Quiz.step = 0; Quiz.answers = {}; if ($('#menu') && !$('#menu').hidden) actions['menu-close'](); renderQuiz(); Overlay.open('quiz'); },

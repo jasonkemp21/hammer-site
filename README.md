@@ -13,7 +13,8 @@ The live site for hammerfitnessandboxing.com. GitHub Pages publishes it from the
 
 How the site works:
 
-- **Book** buttons open the gym's Mindbody schedule on the class date. **Buy** buttons open the Mindbody online store. Bookings, accounts and payments stay in Mindbody.
+- **Book** and **Buy** buttons open a sheet with two ways to do it. *Book on Mindbody* opens the gym's Mindbody schedule on the class date (or the Mindbody store for a pass); payment happens there. *Reserve and pay at the gym* takes the person's name, email and phone, saves the reservation, and the front desk sees it at `/admin/` with the class or pass, the time, whether it's a first visit and whether they need rental gloves. The person pays at the desk when they come in.
+- **A pay-at-the-gym reservation is not a Mindbody booking.** Nothing is entered into Mindbody until staff do it. The desk should check `/admin/` before each class and, if a class can fill up, add the person in Mindbody or call them.
 - **Forms** (contact, private sessions, Kids Boxing, competing) save to Supabase. Staff read them at `/admin/`. If Supabase is down or not set up, the form tells the visitor to call or email instead. It never claims a message was sent when it wasn't.
 - **The shop** is a catalog. Everything in it is sold at the front desk.
 
@@ -44,7 +45,8 @@ These come from the old site, which disagreed with itself in places. Fix them in
    insert into public.admins (email) values ('name@example.com');
    ```
 4. Turn off public sign-ups: **Authentication → Sign In / Providers → Allow new users to sign up: off**. The staff list protects the data even if sign-ups are left on, but switching them off is cleaner.
-5. Get the keys from **Project Settings → API** (on newer dashboards, **API Keys**): the **Project URL** and the **anon / publishable** key. Paste both into `docs/config.js`. Never use the `service_role` or secret key.
+5. **If you ran the setup file before October 27, 2026**, also run `setup/update-1-reservations.sql` the same way. It lets the database accept class and pass reservations. Without it, the pay-at-the-gym option tells visitors to call or email instead.
+6. Get the keys from **Project Settings → API** (on newer dashboards, **API Keys**): the **Project URL** and the **anon / publishable** key. Paste both into `docs/config.js`. Never use the `service_role` or secret key.
 
 On the free plan, Supabase may pause a project that has had no activity for a while. Check their current terms. If it pauses, forms show the phone and email until you restore it from the dashboard.
 
@@ -99,4 +101,4 @@ node build.mjs
 
 This rebuilds `docs/` and keeps the Supabase settings already in `docs/config.js`. Commit and push, and Pages updates in about a minute. Node 18 or newer, no installs needed.
 
-To test the build: `node test/live-site.mjs` runs 43 checks against stand-ins for Supabase and Mindbody. It needs Playwright.
+To test the build: `node test/live-site.mjs` runs 57 checks against stand-ins for Supabase and Mindbody. It needs Playwright.

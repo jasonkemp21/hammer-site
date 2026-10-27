@@ -30,7 +30,7 @@ $$;
 create table if not exists public.requests (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
-  kind text not null check (kind in ('contact', 'boxing', 'muaythai', 'pt', 'compete', 'kids')),
+  kind text not null check (kind in ('contact', 'boxing', 'muaythai', 'pt', 'compete', 'kids', 'booking', 'purchase')),
   name text not null check (char_length(name) between 1 and 200),
   email text not null check (char_length(email) between 3 and 320 and email like '%@%'),
   phone text check (phone is null or char_length(phone) <= 40),

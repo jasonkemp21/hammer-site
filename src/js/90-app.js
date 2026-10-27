@@ -22,7 +22,7 @@ function renderProgs() {
 
 function programCta(p) {
   const c = p.cta;
-  const attrs = c.action === 'book' ? `data-action="book" data-type="${c.type}"` : c.action === 'inquire' ? `data-action="inquire" data-kind="${c.kind}"` : `data-action="buy"`;
+  const attrs = c.action === 'book' ? `data-action="book" data-type="${c.type}"` : c.action === 'inquire' ? `data-action="inquire" data-kind="${c.kind}"` : `data-action="buy" data-item="${c.id}"`;
   return `<button class="btn btn--primary" type="button" ${attrs}>${esc(c.label)} ${icon('go', 'i--go')}</button>`;
 }
 function renderProgramsPage() {

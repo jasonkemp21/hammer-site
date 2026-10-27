@@ -961,6 +961,16 @@ html.is-locked { overflow: hidden; }
 .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
 @keyframes dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
 
+/* ---------- book or buy: the two ways ---------- */
+.ways { display: grid; gap: 12px; }
+.way { display: grid; gap: 6px; padding: 18px 20px; border: 2px solid var(--line); background: var(--surface); color: var(--fg); text-align: left; transition: border-color .15s, box-shadow .15s; }
+.way:hover { border-color: var(--fg); box-shadow: inset 6px 0 0 var(--red); }
+.way b { font: 900 1.5rem/1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.way span { line-height: 1.45; }
+.way small { display: inline-flex; align-items: center; gap: .5em; font: 600 var(--t-micro)/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-top: 4px; }
+.way small .i { width: 1.1em; height: 1.1em; }
+.recap .link { margin-left: auto; }
+
 /* ================= ROUND TIMER ================= */
 .timer { --ring: var(--red); }
 .timer__face { position: relative; width: min(100%, 440px); aspect-ratio: 1; margin-inline: auto; }
@@ -1706,6 +1716,7 @@ html.is-locked { overflow: hidden; }
 <div class="scrim" id="scrim" data-action="overlay-close" hidden></div>
 
 <!-- centered sheets -->
+<div class="sheet on-paper" data-ov="book" role="dialog" aria-modal="true" aria-labelledby="book-title" hidden><div class="sheet__in" data-reserve></div></div>
 <div class="sheet on-paper" data-ov="quiz" role="dialog" aria-modal="true" aria-labelledby="quiz-title" hidden><div class="sheet__in" data-quiz></div></div>
 <div class="sheet on-paper" data-ov="inquire" role="dialog" aria-modal="true" aria-labelledby="inq-title" hidden><div class="sheet__in" data-inquire></div></div>
 <div class="sheet sheet--wide on-paper" data-ov="coach" role="dialog" aria-modal="true" aria-labelledby="coach-title" hidden><div class="sheet__in" data-coachcard></div></div>
@@ -1971,7 +1982,7 @@ const PROGRAMS = [
       'Access can be limited when trainers and clients are using the floor for one-on-one sessions.',
     ],
     points: ['Boxing area and lifting area', 'Showers and lockers', 'Cleaning supplies provided for the equipment you use'],
-    cta: { label: 'Join on Mindbody', action: 'buy', id: 'access' },
+    cta: { label: 'Get Gym Access', action: 'buy', id: 'access' },
   },
 ];
 
@@ -2162,8 +2173,8 @@ const actions = {
 
 // ---- 12-live.js ----
 /* ---------- the live site's two outside services ----------
-   Mindbody: booking, accounts and payments. Every Book and Buy button opens the gym's Mindbody pages.
-   Supabase: messages and session requests from the forms, read by staff at /admin.
+   Mindbody: booking, accounts and payments. Every Book and Buy button offers it (see 35-reserve.js).
+   Supabase: messages, session requests and pay-at-the-gym reservations from the forms, read by staff at /admin.
    Keys come from config.js (window.HBF_CONFIG), so they can change without a rebuild. */
 
 /* the Mindbody week view, opened on the date of the class when there is one */
@@ -2178,23 +2189,6 @@ function openOut(url) {
   try { w = window.open(url, '_blank'); } catch (e) { w = null; }
   if (w) { try { w.opener = null; } catch (e) { /* cross-origin */ } } else { location.href = url; }
 }
-
-Object.assign(actions, {
-  /* Book: the class's day on Mindbody, or this week when no class was picked */
-  'book': (el) => {
-    const key = el && el.dataset.class; const type = el && el.dataset.type;
-    let c = key ? findClass(key) : null;
-    if (!c && type) c = nextClass(buildWeek(), (x) => x.type.id === type);
-    if ($('#menu') && !$('#menu').hidden) actions['menu-close'](true);
-    openOut(mindbodySchedule(c ? c.date : null));
-  },
-  /* Buy a pass, membership or package: the gym's Mindbody online store */
-  'buy': () => {
-    if ($('#menu') && !$('#menu').hidden) actions['menu-close'](true);
-    if (Overlay.current) Overlay.close(true);
-    openOut(GYM.store);
-  },
-});
 
 /* ---------- requests: save to Supabase, or say plainly that it did not go ---------- */
 const LIVE = (() => { const c = window.HBF_CONFIG || {}; return { url: (c.supabaseUrl || '').replace(/\/+$/, ''), key: c.supabaseAnonKey || '' }; })();
@@ -2511,6 +2505,197 @@ Object.assign(actions, {
   },
 });
 
+// ---- 35-reserve.js ----
+/* ---------- Book or Buy: Mindbody, or reserve and pay at the gym ----------
+   One sheet behind every Book and Buy button. A class or a pass is picked, then the visitor chooses
+   Mindbody (pay online, opens in a new tab) or a reservation the front desk sees at /admin and takes payment for in person. */
+const PASS_CHOICES = [['have', 'I already have a pass or membership'], ['intro', 'New client intro: 3 classes for $30'], ['single', 'Single class, $30'], ['unsure', 'Not sure yet, I will decide at the desk']];
+const CLASS_ITEMS = ['intro', 'single', 'pack10', 'unlimited', 'plus', 'hammer', 'hammerplus']; // passes that come with a first class to pick
+const Reserve = { mode: 'class', step: 'pick', key: null, dayN: 0, item: null, pass: 'unsure', first: false, rental: false, firstClass: '', form: { first: '', last: '', email: '', phone: '', note: '' }, errors: {}, sending: false, failed: false, done: null };
+
+/* what a Buy button refers to: a pass, a membership or a one-on-one package */
+function itemInfo(id) {
+  if (!id) return null;
+  if (PASSES[id]) { const p = PASSES[id]; return { id, name: p.name, price: money(p.price) + (p.per ? ' a month' : ''), note: p.note, kind: 'pass' }; }
+  const m = /^pack-(boxing|pt)-(\d+)$/.exec(id);
+  if (m) { const o = ONE_ON_ONE[m[1]]; const tier = o.tiers.find((t) => t[0] === +m[2]); if (!tier) return null; return { id, name: `${o.name}, ${tier[0] === 1 ? 'single session' : tier[0] + ' sessions'}`, price: money(tier[1]), note: 'Packages expire after 90 days. 24-hour notice to cancel or move a session.', kind: 'pack' }; }
+  return null;
+}
+const reserveClass = () => (Reserve.key ? findClass(Reserve.key) : null);
+const classWith = (c) => `${c.type.name}${c.coach ? ' with ' + c.coach.name : ''}`;
+
+function gcalLink(c) {
+  const start = `${ymd(c.date)}T${pad2(Math.floor(c.t / 60))}${pad2(c.t % 60)}00`; const endM = c.t + c.type.mins;
+  const end = `${ymd(c.date)}T${pad2(Math.floor(endM / 60))}${pad2(endM % 60)}00`;
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    + '&text=' + encodeURIComponent(`${c.type.name} at ${GYM.name}`) + '&dates=' + start + '/' + end + '&ctz=' + encodeURIComponent(GYM.tz)
+    + '&details=' + encodeURIComponent(`${c.coach ? 'With ' + stop(c.coach.name) + ' ' : ''}Wear comfortable workout clothes and supportive shoes. Bring a towel and a water bottle. Gloves and wraps rent for $5.`)
+    + '&location=' + encodeURIComponent(`${GYM.name}, ${GYM.street}, ${GYM.city}`);
+}
+
+function renderReserve() {
+  const host = $('[data-reserve]'); if (!host) return; const r = Reserve; const c = reserveClass(); const item = itemInfo(r.item);
+  const week = WEEKVIEW; let html = '';
+
+  if (r.step === 'pick') {
+    const days = week.days.filter((d) => d.classes.some((x) => x.type.bookable && x.startsIn > 0));
+    if (!days.some((d) => d.n === r.dayN)) r.dayN = days.length ? days[0].n : 0;
+    const chips = days.map((d) => `<button class="chip" type="button" aria-pressed="${d.n === r.dayN}" data-action="rv-day" data-n="${d.n}">${d.n === 0 ? 'Today' : d.n === 1 ? 'Tomorrow' : DAYS3[d.day] + ' ' + fmtMonthDay.format(d.date)}</button>`).join('');
+    const day = week.days[r.dayN];
+    const rows = day.classes.filter((x) => x.type.bookable && x.startsIn > 0).map((x) => `<label class="opt">
+        <input type="radio" name="rv-class" value="${x.key}" ${x.key === r.key ? 'checked' : ''}>
+        <span class="opt__time data">${clock(x.t).text}</span>
+        <span class="opt__main"><b>${esc(x.type.name)}</b><small>${x.coach ? 'with ' + esc(x.coach.name) + ' · ' : ''}${x.type.mins} min · ${esc(x.type.level)}</small></span>
+        <span class="tag tag--${x.type.tag}">${TAG_LABEL[x.type.tag]}</span></label>`).join('');
+    html = sheetHead('Book a class', 'Pick your class', 'book-title') + `<div class="sheet__body">
+        <div class="chips">${chips}</div>
+        <div class="opts" role="radiogroup" aria-label="Classes on this day">${rows || '<p class="muted">No classes left on this day.</p>'}</div>
+      </div>
+      <footer class="sheet__foot"><span class="small muted">${c ? esc(classLine(c)) : 'Choose a class to continue.'}</span>
+        <button class="btn btn--primary" type="button" data-action="rv-how" ${c ? '' : 'disabled'}>Continue ${icon('go', 'i--go')}</button></footer>`;
+  }
+
+  if (r.step === 'how') {
+    const recap = r.mode === 'class' && c
+      ? `<div class="recap"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span><b>${esc(c.type.name)}</b><span>${esc(classLine(c))}${c.coach ? ' · ' + esc(c.coach.name) : ''}</span><button class="link small" type="button" data-action="rv-pick">Change</button></div>`
+      : item ? `<div class="recap"><b>${esc(item.name)}</b><span>${esc(item.price)}</span></div>` : '';
+    html = sheetHead(r.mode === 'class' ? 'Book a class' : 'Get a pass', 'How would you like to do it?', 'book-title') + `<div class="sheet__body">
+        ${recap}
+        <div class="ways">
+          <button class="way" type="button" data-action="rv-mindbody">
+            <b>${r.mode === 'class' ? 'Book on Mindbody' : 'Buy on Mindbody'}</b>
+            <span>Pay online and ${r.mode === 'class' ? 'lock in your spot' : 'have it on your account'} right now. Opens the gym's Mindbody page in a new tab.</span>
+            <small>${icon('out')} clients.mindbodyonline.com</small>
+          </button>
+          <button class="way" type="button" data-action="rv-form">
+            <b>Reserve and pay at the gym</b>
+            <span>Leave your name and number here. The front desk ${r.mode === 'class' ? 'holds your spot' : 'has it ready'}, and you pay when you come in.</span>
+            <small>${icon('pin')} Cash or card at the desk</small>
+          </button>
+        </div>
+      </div>
+      <footer class="sheet__foot"><span class="small muted">Questions? Call ${GYM.phone}</span></footer>`;
+  }
+
+  if (r.step === 'form') {
+    const e = r.errors; const f = r.form;
+    const upcoming = allUpcoming(week).filter((x) => x.type.bookable).slice(0, 24);
+    const firstClass = r.mode === 'item' && item && CLASS_ITEMS.indexOf(item.id) >= 0
+      ? `<div class="field field--full"><label for="rv-first-class">Your first class <span class="muted">(optional)</span></label><select class="select" id="rv-first-class"><option value="">I will pick one later</option>${upcoming.map((x) => `<option value="${x.key}" ${x.key === r.firstClass ? 'selected' : ''}>${esc(classWith(x))}, ${esc(classLine(x))}</option>`).join('')}</select></div>` : '';
+    const passPick = r.mode === 'class' ? `<div class="field field--full"><label for="rv-pass">What will you use for this class?</label><select class="select" id="rv-pass">${PASS_CHOICES.map(([id, label]) => `<option value="${id}" ${r.pass === id ? 'selected' : ''}>${label}</option>`).join('')}</select></div>` : '';
+    html = sheetHead('Pay at the gym', r.mode === 'class' ? 'Reserve your spot' : 'Reserve your pass', 'book-title') + `<form class="sheet__body" data-form="reserve" novalidate>
+        ${r.mode === 'class' && c ? `<div class="recap"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span><b>${esc(c.type.name)}</b><span>${esc(classLine(c))}${c.coach ? ' · ' + esc(c.coach.name) : ''}</span></div>` : item ? `<div class="recap"><b>${esc(item.name)}</b><span>${esc(item.price)}</span></div>` : ''}
+        <div class="form-grid">
+          ${field('rv-fn', 'First name', f.first, { auto: 'given-name', error: e.first })}
+          ${field('rv-ln', 'Last name', f.last, { auto: 'family-name', error: e.last })}
+          ${field('rv-em', 'Email', f.email, { type: 'email', auto: 'email', inputmode: 'email', error: e.email })}
+          ${field('rv-ph', 'Mobile', f.phone, { type: 'tel', auto: 'tel', inputmode: 'tel', error: e.phone })}
+          ${passPick}${firstClass}
+          <label class="check field--full"><input type="checkbox" id="rv-first" ${r.first ? 'checked' : ''}><span><b>This is my first time at Hammer</b><br><span class="muted">New clients get 3 classes for $30 and 25% off packages.</span></span></label>
+          ${r.mode === 'class' ? `<label class="check field--full"><input type="checkbox" id="rv-rental" ${r.rental ? 'checked' : ''}><span><b>I need gloves and wraps</b><br><span class="muted">The gym rents them for $5.</span></span></label>` : ''}
+          <div class="field field--full"><label for="rv-note">Anything we should know? <span class="muted">(optional)</span></label><textarea class="textarea" id="rv-note" maxlength="4000">${esc(f.note)}</textarea></div>
+        </div>
+        ${honeypot()}
+        <p class="small muted">The front desk will have your reservation. Pay when you arrive, by cash or card.</p>
+        ${r.failed ? sendFailed() : ''}
+      </form>
+      <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="rv-how">${icon('back')} Back</button>
+        <button class="btn btn--primary" type="button" data-action="rv-send" ${r.sending ? 'disabled' : ''}>${r.sending ? 'Sending…' : (r.mode === 'class' ? 'Reserve my spot' : 'Reserve it')}</button></footer>`;
+  }
+
+  if (r.step === 'done' && r.done) {
+    const d = r.done; const cls = d.cls; const s = cls ? clock(cls.t) : null;
+    html = `<header class="sheet__head sheet__head--done on-red"><div><p class="label">Reserved · pay at the gym</p><h2 class="h-l" id="book-title">${cls ? "You're on the card" : 'It is set aside for you'}${d.first ? ', ' + esc(d.first) : ''}.</h2></div>
+        <button class="iconbtn" type="button" data-action="overlay-close" aria-label="Close">${icon('x')}</button></header>
+      <div class="sheet__body">
+        ${cls ? `<div class="stub">
+          <div class="stub__time"><b>${s.h}:${pad2(s.m)}</b><span>${s.ap}</span></div>
+          <div class="stub__what"><b>${esc(cls.type.name)}</b><span>${esc(classLine(cls))}</span><span>${cls.coach ? 'with ' + esc(cls.coach.name) + ' · ' : ''}${cls.type.mins} min</span></div>
+          <div class="stub__pass"><span class="label">Pay</span><b>At the desk</b></div>
+        </div>` : `<div class="recap"><b>${esc(d.item.name)}</b><span>${esc(d.item.price)} · pay at the desk</span></div>`}
+        <div class="bring">
+          <p class="label">${cls ? 'Before you come' : 'Next'}</p>
+          <ul>
+            <li>${icon('check')}<span>${cls ? 'Come a few minutes early to pay and check in at the front desk.' : 'Come to the front desk, pay, and your pass is ready to use.'}</span></li>
+            <li>${icon('check')}<span>Wear comfortable workout clothes and supportive athletic shoes.</span></li>
+            <li>${icon('check')}<span>${d.rental ? 'Rental gloves and wraps are on your reservation, $5 when you arrive.' : 'Bring gloves and wraps, or rent them at the gym for $5.'}</span></li>
+            <li>${icon('check')}<span>We are at North and Mohawk, a few minutes from the Sedgwick Brown Line stop.</span></li>
+          </ul>
+        </div>
+        <div class="btn-row">
+          ${cls ? `<a class="btn btn--solid" href="${gcalLink(cls)}" target="_blank" rel="noopener">${icon('cal')} Add to Google Calendar</a>` : ''}
+          <a class="btn btn--ghost" href="${GYM.maps}" target="_blank" rel="noopener">${icon('pin')} Directions</a>
+        </div>
+        <p class="small muted">Plans change? Call <a class="link" href="${GYM.tel}">${GYM.phone}</a> and we will move it.</p>
+      </div>
+      <footer class="sheet__foot"><span></span><button class="btn btn--primary" type="button" data-action="overlay-close">Done</button></footer>`;
+  }
+  host.innerHTML = html;
+  if (r.step === 'form') formOpened.reserve = formOpened.reserve || Date.now();
+}
+function readReserve() {
+  const g = (id) => { const el = $('#' + id); return el ? el.value : ''; };
+  if ($('#rv-fn')) Reserve.form = { first: g('rv-fn'), last: g('rv-ln'), email: g('rv-em'), phone: g('rv-ph'), note: g('rv-note') };
+  if ($('#rv-pass')) Reserve.pass = g('rv-pass');
+  if ($('#rv-first-class')) Reserve.firstClass = g('rv-first-class');
+  if ($('#rv-first')) Reserve.first = $('#rv-first').checked;
+  if ($('#rv-rental')) Reserve.rental = $('#rv-rental').checked;
+}
+function openReserve(mode, opts) {
+  const r = Reserve; r.mode = mode; r.errors = {}; r.sending = false; r.failed = false; r.done = null;
+  WEEKVIEW = buildWeek();
+  if (mode === 'class') {
+    let c = opts.key ? findClass(opts.key) : null;
+    if ((!c || c.startsIn <= 0) && opts.type) c = nextClass(WEEKVIEW, (x) => x.type.id === opts.type);
+    if (c && c.startsIn <= 0) c = null;
+    r.key = c ? c.key : null; r.dayN = c ? c.n : 0; r.item = null;
+    r.step = c ? 'how' : 'pick';
+  } else {
+    r.item = opts.item; r.key = null; r.step = 'how';
+    if (!itemInfo(r.item)) { openOut(GYM.store); return; }
+  }
+  if ($('#menu') && !$('#menu').hidden) actions['menu-close'](true);
+  renderReserve(); Overlay.open('book');
+}
+Object.assign(actions, {
+  'book': (el) => openReserve('class', { key: el && el.dataset.class, type: el && el.dataset.type }),
+  'buy': (el) => openReserve('item', { item: (el && el.dataset.item) || 'single' }),
+  'rv-day': (el) => { Reserve.dayN = +el.dataset.n; const d = WEEKVIEW.days[Reserve.dayN]; const first = d.classes.find((x) => x.type.bookable && x.startsIn > 0); Reserve.key = first ? first.key : null; renderReserve(); },
+  'rv-pick': () => { Reserve.step = 'pick'; renderReserve(); },
+  'rv-how': () => { readReserve(); if (Reserve.mode === 'class' && !Reserve.key) return; Reserve.step = 'how'; Reserve.failed = false; renderReserve(); const h = $('[data-ov="book"] h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } },
+  'rv-form': () => { Reserve.step = 'form'; renderReserve(); const i = $('#rv-fn'); if (i) i.focus(); },
+  'rv-mindbody': () => { const c = reserveClass(); Overlay.close(true); openOut(Reserve.mode === 'class' ? mindbodySchedule(c ? c.date : null) : GYM.store); },
+  'rv-send': async () => {
+    const r = Reserve; if (r.sending) return; readReserve();
+    const ok1 = validateContact(r.form, r);
+    if (!/\d{7,}/.test(r.form.phone.replace(/\D/g, ''))) r.errors.phone = 'Enter a mobile number so the desk can reach you.';
+    if (!ok1 || r.errors.phone) { renderReserve(); const bad = $('[data-ov="book"] .has-error input'); if (bad) bad.focus(); return; }
+    const c = reserveClass(); const item = itemInfo(r.item); const f = r.form;
+    if (r.mode === 'class' && !c) { r.step = 'pick'; renderReserve(); return; }
+    const details = { pay: 'At the gym' };
+    if (r.mode === 'class') {
+      details.class = c.type.name; details.when = classLine(c); if (c.coach) details.coach = c.coach.name;
+      details.pass = (PASS_CHOICES.find((p) => p[0] === r.pass) || PASS_CHOICES[3])[1];
+    } else {
+      details.item = item.name; details.price = item.price;
+      const fc = r.firstClass ? findClass(r.firstClass) : null; if (fc) details.first_class = `${classWith(fc)}, ${classLine(fc)}`;
+    }
+    details.first_time = r.first ? 'Yes' : 'No';
+    if (r.mode === 'class') details.rental = r.rental ? 'Yes, gloves and wraps ($5)' : 'No';
+    const trap = trapValue('[data-ov="book"]');
+    r.sending = true; r.failed = false; renderReserve();
+    const ok = await sendRequest(r.mode === 'class' ? 'booking' : 'purchase', { name: `${f.first.trim()} ${f.last.trim()}`, email: f.email, phone: f.phone, message: f.note }, details, trap);
+    r.sending = false;
+    if (ok) { r.done = { cls: c, item, first: f.first.trim(), rental: r.rental }; r.step = 'done'; r.form = { first: '', last: '', email: '', phone: '', note: '' }; r.firstClass = ''; r.rental = false; }
+    else r.failed = true;
+    renderReserve();
+  },
+});
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (t.name === 'rv-class') { Reserve.key = t.value; renderReserve(); const again = $(`input[name="rv-class"][value="${t.value}"]`); if (again) again.focus(); }
+});
+
 // ---- 40-pricing.js ----
 /* ---------- pricing: the cost-per-class calculator and the full price list ---------- */
 const MONTH = 52 / 12; // weeks in an average month
@@ -2540,7 +2725,7 @@ function calcPlans() {
       <p class="plan__price">${money(Math.round(r.per * 100) / 100)}<small>a class</small></p>
       <div class="plan__bar" role="img" aria-label="About ${money(Math.round(r.month))} a month"><i style="--w:${r.w}%"></i></div>
       <div class="plan__foot"><span>About <b>${money(Math.round(r.month))}</b> a month</span>
-        ${r.id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${r.best ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy">Buy on Mindbody</button>`}</div>
+        ${r.id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${r.best ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy" data-item="${r.id}">Get it</button>`}</div>
     </div>`).join('');
   const line = `At ${state.freq} ${state.freq === 1 ? 'class' : 'classes'} a week, ${c.best.id === 'unlimited' ? 'Unlimited' : c.best.id === 'pack10' ? 'the 10-class pack' : 'paying per class'} saves you about ${money(c.saves)} a month over the next best option.`;
   return intro + rows + `<p class="small calc__note"><b>${line}</b> <span class="muted">Months are averaged at 4.33 weeks.</span></p>`;
@@ -2601,7 +2786,7 @@ function packPicker(kind) {
         <div><dt>You save</dt><dd>${m.saves > 0 ? money(m.saves) + ' against single sessions' : 'Buy a pack to save'}</dd></div>
       </dl>
       <div class="btn-row"><button class="btn btn--primary" type="button" data-action="inquire" data-kind="${kind}">Request a session</button>
-        <button class="btn btn--ghost" type="button" data-action="buy">Buy on Mindbody</button></div>
+        <button class="btn btn--ghost" type="button" data-action="buy" data-item="pack-${kind}-${n}">Get this pack</button></div>
     </article>`;
 }
 
@@ -2613,7 +2798,7 @@ function passCard(id) {
       <p class="pass__price">${cut ? `<s>${money(p.price)}</s>` : ''}<b>${money(price)}</b><span>${p.per ? 'a month' : p.classes > 1 ? `${p.classes} classes` : 'one class'}</span></p>
       ${punch}
       <p class="small muted">${esc(p.note)}${cut ? ' First-time price.' : ''}</p>
-      ${id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${id === 'unlimited' ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy">${id === 'intro' ? 'Claim the offer' : 'Buy on Mindbody'}</button>`}
+      ${id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${id === 'unlimited' ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy" data-item="${id}">${id === 'intro' ? 'Claim the offer' : 'Get it'}</button>`}
     </article>`;
 }
 
@@ -2756,14 +2941,14 @@ function quizResult() {
     pass = { label: `${n}-session pack`, price: money(m.list), action: 'inquire', kind };
     passWhy = `${money(Math.round(m.list / n))} a session instead of ${money(m.single)}. First-time clients take 25% off.`;
   } else if (a.style === 'own') {
-    pass = { label: 'Gym Access', price: '$100 a month', action: 'buy' }; passWhy = 'Come in during open hours and train at your own pace.';
+    pass = { label: 'Gym Access', price: '$100 a month', action: 'buy', item: 'access' }; passWhy = 'Come in during open hours and train at your own pace.';
   } else if (a.goal === 'compete' && freq >= 3) {
-    pass = { label: 'Unlimited Hammer', price: '$275 a month', action: 'buy' }; passWhy = 'Unlimited classes, general access and a specialty skill session every month.';
+    pass = { label: 'Unlimited Hammer', price: '$275 a month', action: 'buy', item: 'hammer' }; passWhy = 'Unlimited classes, general access and a specialty skill session every month.';
   } else if (freq >= 2) {
     const per = 150 / (freq * MONTH);
-    pass = { label: 'Group Boxing Unlimited', price: '$150 a month', action: 'buy' }; passWhy = `At ${freq === 4 ? 'four or more' : freq === 3 ? 'three' : 'two'} classes a week that is about ${money(Math.round(per * 100) / 100)} a class.`;
+    pass = { label: 'Group Boxing Unlimited', price: '$150 a month', action: 'buy', item: 'unlimited' }; passWhy = `At ${freq === 4 ? 'four or more' : freq === 3 ? 'three' : 'two'} classes a week that is about ${money(Math.round(per * 100) / 100)} a class.`;
   } else {
-    pass = { label: '10-class pack', price: '$250', action: 'buy' }; passWhy = 'At once a week that is $25 a class, and one pack lasts about ten weeks.';
+    pass = { label: '10-class pack', price: '$250', action: 'buy', item: 'pack10' }; passWhy = 'At once a week that is $25 a class, and one pack lasts about ten weeks.';
   }
   return { prog, why, nx, pass, passWhy, typeId, compete: a.goal === 'compete' };
 }
@@ -2794,7 +2979,7 @@ function renderQuiz() {
     <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="quiz-restart">Start over</button>
       ${r.nx ? `<button class="btn btn--primary" type="button" data-action="book" data-class="${r.nx.key}">Book this class ${icon('go', 'i--go')}</button>`
         : r.pass.action === 'inquire' ? `<button class="btn btn--primary" type="button" data-action="inquire" data-kind="${r.pass.kind}">Request a session</button>`
-          : `<button class="btn btn--primary" type="button" data-action="buy">Get ${esc(r.pass.label)} on Mindbody</button>`}</footer>`;
+          : `<button class="btn btn--primary" type="button" data-action="buy" data-item="${r.pass.item}">Get ${esc(r.pass.label)}</button>`}</footer>`;
 }
 Object.assign(actions, {
   'quiz-open': () => { Quiz.step = 0; Quiz.answers = {}; if ($('#menu') && !$('#menu').hidden) actions['menu-close'](); renderQuiz(); Overlay.open('quiz'); },
@@ -3068,7 +3253,7 @@ function localAnswer(q) {
   if (has('bring', ' wear', 'glove', 'wrap', ' gear', 'equipment', ' rent', 'shoes')) return { text: 'Wear comfortable workout clothes and supportive athletic shoes, and bring a towel and a water bottle. Bring gloves and wraps if you have them. If not, the gym rents them for $5. The shop also carries wraps for $14.88 and gloves from $40.', actions: [route('Shop gear', 'shop')] };
   if (has('shower', 'locker', 'changing')) return { text: 'Yes. There are showers and lockers, so a 7 AM or noon class fits around work. Bring your own towel, or buy a clean one at the gym.', actions: [] };
   if (has('clean', 'sanit', 'covid', 'mask', 'hygien', ' sick', 'germ')) return { text: 'Staff sanitize the equipment and the floor after classes and private sessions, and Gym Access members wipe down what they use with the supplies provided. Masks are not required, though private clients can ask their trainer to wear one. If you are feeling unwell, please stay home.', actions: [route('Read the FAQ', 'visit', 'faq')] };
-  if (has('gym access', 'general access', 'open gym', 'on my own', 'by myself', 'weights', 'weight room', 'lifting')) return { text: 'Gym Access is $100 a month. Train on your own schedule during open hours, with full use of the boxing area and the lifting area. Access can be limited while trainers run one-on-one sessions.', actions: [{ label: 'Join on Mindbody', action: 'buy' }, route('See all pricing', 'pricing')] };
+  if (has('gym access', 'general access', 'open gym', 'on my own', 'by myself', 'weights', 'weight room', 'lifting')) return { text: 'Gym Access is $100 a month. Train on your own schedule during open hours, with full use of the boxing area and the lifting area. Access can be limited while trainers run one-on-one sessions.', actions: [{ label: 'Get Gym Access', action: 'buy', data: { item: 'access' } }, route('See all pricing', 'pricing')] };
   if (has(' kid', 'child', ' teen', ' son ', 'daughter', 'youth', 'haven', 'year old')) return { text: 'Kids Boxing runs Monday, Wednesday and Friday at 5 PM, and the front desk handles enrollment. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons from 4 to 7 PM.', actions: [{ label: 'Ask about Kids Boxing', action: 'inquire', data: { kind: 'kids' } }, route('About Hammer’s Haven', 'haven')] };
   if (has('park')) return { text: `I do not have parking details listed. The front desk can tell you: ${GYM.phone}. By train, Sedgwick on the Brown Line is about a 4-minute walk.`, actions: [route('Getting here', 'visit')] };
   if (has('where', 'address', 'location', 'direction', 'get there', 'transit', 'cta', ' bus', 'brown line', 'red line', 'station', 'subway', ' near')) return { text: `${GYM.street}, at the corner of North and Mohawk in Old Town. Sedgwick (Brown and Purple lines) is about a 4-minute walk. North/Clybourn on the Red Line is about 8 minutes, and the #72 North Ave bus runs past.`, actions: [{ label: 'Open directions', href: GYM.maps }, route('Map and hours', 'visit')] };
@@ -3136,6 +3321,7 @@ document.addEventListener('submit', (e) => {
   e.preventDefault();
   if (f.dataset.form === 'ask') { const i = $('#ask-input'); const q = i.value; i.value = ''; askSend(q); }
   else if (f.dataset.form === 'inquiry') actions['inq-send']();
+  else if (f.dataset.form === 'reserve') actions['rv-send']();
   else if (f.dataset.form === 'contact') actions['contact-send']();
 });
 
@@ -3164,7 +3350,7 @@ function renderProgs() {
 
 function programCta(p) {
   const c = p.cta;
-  const attrs = c.action === 'book' ? `data-action="book" data-type="${c.type}"` : c.action === 'inquire' ? `data-action="inquire" data-kind="${c.kind}"` : `data-action="buy"`;
+  const attrs = c.action === 'book' ? `data-action="book" data-type="${c.type}"` : c.action === 'inquire' ? `data-action="inquire" data-kind="${c.kind}"` : `data-action="buy" data-item="${c.id}"`;
   return `<button class="btn btn--primary" type="button" ${attrs}>${esc(c.label)} ${icon('go', 'i--go')}</button>`;
 }
 function renderProgramsPage() {

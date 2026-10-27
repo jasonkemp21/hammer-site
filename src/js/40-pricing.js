@@ -26,7 +26,7 @@ function calcPlans() {
       <p class="plan__price">${money(Math.round(r.per * 100) / 100)}<small>a class</small></p>
       <div class="plan__bar" role="img" aria-label="About ${money(Math.round(r.month))} a month"><i style="--w:${r.w}%"></i></div>
       <div class="plan__foot"><span>About <b>${money(Math.round(r.month))}</b> a month</span>
-        ${r.id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${r.best ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy">Buy on Mindbody</button>`}</div>
+        ${r.id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${r.best ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy" data-item="${r.id}">Get it</button>`}</div>
     </div>`).join('');
   const line = `At ${state.freq} ${state.freq === 1 ? 'class' : 'classes'} a week, ${c.best.id === 'unlimited' ? 'Unlimited' : c.best.id === 'pack10' ? 'the 10-class pack' : 'paying per class'} saves you about ${money(c.saves)} a month over the next best option.`;
   return intro + rows + `<p class="small calc__note"><b>${line}</b> <span class="muted">Months are averaged at 4.33 weeks.</span></p>`;
@@ -87,7 +87,7 @@ function packPicker(kind) {
         <div><dt>You save</dt><dd>${m.saves > 0 ? money(m.saves) + ' against single sessions' : 'Buy a pack to save'}</dd></div>
       </dl>
       <div class="btn-row"><button class="btn btn--primary" type="button" data-action="inquire" data-kind="${kind}">Request a session</button>
-        <button class="btn btn--ghost" type="button" data-action="buy">Buy on Mindbody</button></div>
+        <button class="btn btn--ghost" type="button" data-action="buy" data-item="pack-${kind}-${n}">Get this pack</button></div>
     </article>`;
 }
 
@@ -99,7 +99,7 @@ function passCard(id) {
       <p class="pass__price">${cut ? `<s>${money(p.price)}</s>` : ''}<b>${money(price)}</b><span>${p.per ? 'a month' : p.classes > 1 ? `${p.classes} classes` : 'one class'}</span></p>
       ${punch}
       <p class="small muted">${esc(p.note)}${cut ? ' First-time price.' : ''}</p>
-      ${id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${id === 'unlimited' ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy">${id === 'intro' ? 'Claim the offer' : 'Buy on Mindbody'}</button>`}
+      ${id === 'single' ? `<button class="btn btn--ghost btn--sm" type="button" data-action="book">Book a class</button>` : `<button class="btn ${id === 'unlimited' ? 'btn--primary' : 'btn--ghost'} btn--sm" type="button" data-action="buy" data-item="${id}">${id === 'intro' ? 'Claim the offer' : 'Get it'}</button>`}
     </article>`;
 }
 

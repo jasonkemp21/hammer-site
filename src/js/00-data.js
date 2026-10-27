@@ -250,7 +250,7 @@ const PROGRAMS = [
       'Access can be limited when trainers and clients are using the floor for one-on-one sessions.',
     ],
     points: ['Boxing area and lifting area', 'Showers and lockers', 'Cleaning supplies provided for the equipment you use'],
-    cta: { label: 'Join on Mindbody', action: 'buy', id: 'access' },
+    cta: { label: 'Get Gym Access', action: 'buy', id: 'access' },
   },
 ];
 
