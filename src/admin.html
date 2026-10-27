@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Front Desk Requests | Hammer Boxing & Fitness</title>
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Big+Shoulders+Display:wght@800;900&family=Chivo+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --ink: #110D0D; --paper: #F6F3F1; --white: #fff; --red: #D81E26; --red-deep: #A7141B; --blue: #1F7FB0; --go: #1E8A4C;
+  --mute: #5C5250; --line: #D6CEC9; --surface: #fff;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --data: "Chivo Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 400 1rem/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.top { background: var(--ink); color: var(--paper); border-bottom: 4px solid var(--red); }
+.top__in, .main { width: min(100% - 32px, 1100px); margin-inline: auto; }
+.top__in { display: flex; align-items: center; gap: 16px; min-height: 64px; flex-wrap: wrap; padding-block: 8px; }
+.brand { font: 900 1.75rem/1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.brand span { color: var(--red); }
+.top__who { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: .875rem; color: #B7ABA9; flex-wrap: wrap; }
+.main { padding-block: 28px 64px; display: grid; gap: 20px; }
+h1 { font: 900 clamp(2.25rem, 6vw, 3.5rem)/.9 var(--display); text-transform: uppercase; margin: 0; }
+.muted { color: var(--mute); }
+.small { font-size: .875rem; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 2px solid transparent; background: var(--red); color: #fff; font: 700 .8125rem/1 var(--body); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+.btn:hover { background: var(--red-deep); }
+.btn--ghost { background: transparent; color: inherit; border-color: currentColor; }
+.btn--ghost:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.top .btn--ghost:hover { background: var(--paper); color: var(--ink); }
+.btn--sm { min-height: 36px; padding: 0 12px; font-size: .75rem; }
+.btn[disabled] { opacity: .5; cursor: wait; }
+.card { background: var(--surface); border: 1px solid var(--line); padding: clamp(18px, 3vw, 28px); }
+.login { max-width: 420px; display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field label { font: 700 .75rem/1.2 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+.input { width: 100%; min-height: 48px; padding: 10px 12px; border: 2px solid var(--line); background: #fff; }
+.input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px var(--blue); }
+.alert { padding: 12px 14px; border-left: 5px solid var(--red); background: #FBE9EA; font-size: .9375rem; }
+.alert--ok { border-color: var(--go); background: #E8F4ED; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { min-height: 40px; padding: 0 14px; border: 2px solid var(--line); background: transparent; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.count { font: 500 .8125rem/1 var(--data); }
+.search { flex: 1 1 220px; max-width: 360px; }
+.list { display: grid; gap: 12px; }
+.req { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--red); padding: 16px 18px; display: grid; gap: 10px; }
+.req.is-handled { border-left-color: var(--line); }
+.req.is-handled .req__name { color: var(--mute); }
+.req__head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; }
+.pill { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 10px; border-radius: 99px; background: var(--ink); color: var(--paper); font: 700 .6875rem/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; }
+.pill--kids { background: var(--blue); }
+.pill--contact { background: #5C5250; }
+.pill--done { background: transparent; color: var(--go); box-shadow: inset 0 0 0 1.5px var(--go); }
+.req__name { font: 800 1.375rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.req__time { margin-left: auto; font: 400 .8125rem/1.2 var(--data); color: var(--mute); }
+.req__contact { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .9375rem; }
+.req__msg { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 75ch; margin: 0; }
+.req__details { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .875rem; color: var(--mute); margin: 0; }
+.req__details b { color: var(--ink); font-weight: 600; }
+.req__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.empty { padding: 36px 20px; text-align: center; color: var(--mute); border: 2px dashed var(--line); }
+.note { font-size: .875rem; color: var(--mute); }
+@media (max-width: 560px) { .req__time { margin-left: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top__in">
+    <div class="brand">Hammer <span>Front desk</span></div>
+    <div class="top__who" data-who hidden><span data-email></span><button class="btn btn--ghost btn--sm" type="button" data-signout>Sign out</button></div>
+  </div>
+</header>
+
+<main class="main">
+  <section class="card login" data-login hidden>
+    <h1>Sign in</h1>
+    <p class="muted small">Staff only. Messages and session requests from the website land here.</p>
+    <form class="login" data-login-form novalidate>
+      <div class="field"><label for="em">Email</label><input class="input" id="em" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="pw">Password</label><input class="input" id="pw" type="password" autocomplete="current-password" required></div>
+      <div class="alert" data-login-error role="alert" hidden></div>
+      <button class="btn" type="submit" data-login-btn>Sign in</button>
+    </form>
+  </section>
+
+  <section class="card" data-setup hidden>
+    <h1>Not set up yet</h1>
+    <p>This page needs the Supabase address and public key in <code>config.js</code>. See the setup guide.</p>
+  </section>
+
+  <section data-app hidden>
+    <div style="display:grid;gap:18px">
+      <div class="bar">
+        <h1>Requests</h1>
+        <button class="btn btn--ghost btn--sm" type="button" data-refresh>Refresh</button>
+        <span class="note" data-updated></span>
+      </div>
+      <div class="bar">
+        <div class="tabs" role="group" aria-label="Show">
+          <button class="tab" type="button" data-filter="new" aria-pressed="true">New <span class="count" data-count="new">0</span></button>
+          <button class="tab" type="button" data-filter="handled" aria-pressed="false">Handled <span class="count" data-count="handled">0</span></button>
+          <button class="tab" type="button" data-filter="all" aria-pressed="false">All <span class="count" data-count="all">0</span></button>
+        </div>
+        <input class="input search" type="search" placeholder="Search name, email or message" aria-label="Search requests" data-search>
+      </div>
+      <div class="alert" data-app-error role="alert" hidden></div>
+      <div class="list" data-list aria-live="polite"></div>
+      <p class="note">Class bookings and payments are in your Mindbody account. This page shows messages and requests sent from the website.</p>
+    </div>
+  </section>
+</main>
+
+<script src="../config.js"></script>
+<script>
+(function () {
+  'use strict';
+  const C = window.HBF_CONFIG || {};
+  const URL_ = (C.supabaseUrl || '').replace(/\/+$/, ''); const KEY = C.supabaseAnonKey || '';
+  const $ = (s) => document.querySelector(s); const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const KINDS = { contact: 'Message', boxing: 'Private boxing', muaythai: 'Private Muay Thai', pt: 'Personal training', compete: 'Competing', kids: 'Kids Boxing' };
+  const LABELS = { request: 'Request', coach: 'Coach', best_times: 'Best times', sessions: 'Sessions', topic: 'Topic' };
+  const when = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const S = { session: null, rows: [], filter: 'new', q: '', busy: {} };
+
+  /* the session lives in this tab only and ends when the tab closes */
+  const saveSession = () => { try { if (S.session) sessionStorage.setItem('hbf-admin', JSON.stringify(S.session)); else sessionStorage.removeItem('hbf-admin'); } catch (e) { /* storage blocked */ } };
+  const loadSession = () => { try { return JSON.parse(sessionStorage.getItem('hbf-admin') || 'null'); } catch (e) { return null; } };
+
+  async function auth(grant, body) {
+    const res = await fetch(`${URL_}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { const err = new Error(data.error_description || data.msg || data.message || 'Sign-in failed'); err.status = res.status; throw err; }
+    return { access: data.access_token, refresh: data.refresh_token, expires: Date.now() + (data.expires_in || 3600) * 1000, email: (data.user && data.user.email) || body.email || '' };
+  }
+  async function token() {
+    if (!S.session) throw Object.assign(new Error('Signed out'), { status: 401 });
+    if (Date.now() > S.session.expires - 60000) { const email = S.session.email; S.session = await auth('refresh_token', { refresh_token: S.session.refresh }); S.session.email = S.session.email || email; saveSession(); }
+    return S.session.access;
+  }
+  async function api(path, opts) {
+    opts = opts || {};
+    const res = await fetch(`${URL_}/rest/v1/${path}`, Object.assign({}, opts, { headers: Object.assign({ apikey: KEY, Authorization: `Bearer ${await token()}`, 'Content-Type': 'application/json' }, opts.headers || {}) }));
+    if (res.status === 401) { signOut('Your session ended. Sign in again.'); throw new Error('401'); }
+    if (!res.ok) throw new Error(`The database answered ${res.status}.`);
+    return res.status === 204 ? null : res.json();
+  }
+
+  function show(view) {
+    $('[data-login]').hidden = view !== 'login'; $('[data-app]').hidden = view !== 'app'; $('[data-setup]').hidden = view !== 'setup';
+    $('[data-who]').hidden = view !== 'app';
+  }
+  function signOut(msg) {
+    if (S.session) { fetch(`${URL_}/auth/v1/logout`, { method: 'POST', headers: { apikey: KEY, Authorization: `Bearer ${S.session.access}` } }).catch(() => {}); }
+    S.session = null; S.rows = []; saveSession(); show('login');
+    const e = $('[data-login-error]'); e.hidden = !msg; e.textContent = msg || '';
+  }
+
+  async function load() {
+    const errBox = $('[data-app-error]');
+    try {
+      S.rows = await api('requests?select=*&order=created_at.desc&limit=1000');
+      errBox.hidden = true;
+      $('[data-updated]').textContent = 'Updated ' + new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date());
+    } catch (e) {
+      if (e.message === '401') return;
+      errBox.hidden = false; errBox.textContent = 'Could not load requests. Check your connection and press Refresh. (' + e.message + ')';
+    }
+    render();
+  }
+
+  function render() {
+    const counts = { new: 0, handled: 0, all: S.rows.length };
+    S.rows.forEach((r) => { counts[r.status === 'handled' ? 'handled' : 'new'] += 1; });
+    Object.keys(counts).forEach((k) => { $(`[data-count="${k}"]`).textContent = counts[k]; });
+    $$('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === S.filter)));
+    document.title = (counts.new ? `(${counts.new}) ` : '') + 'Front Desk Requests | Hammer Boxing & Fitness';
+    const q = S.q.trim().toLowerCase();
+    const rows = S.rows.filter((r) => S.filter === 'all' || (S.filter === 'handled' ? r.status === 'handled' : r.status !== 'handled'))
+      .filter((r) => !q || [r.name, r.email, r.phone, r.message, JSON.stringify(r.details || {})].join(' ').toLowerCase().indexOf(q) >= 0);
+    const list = $('[data-list]');
+    if (!rows.length) {
+      list.innerHTML = `<div class="empty">${S.rows.length ? (q ? 'Nothing matches that search.' : S.filter === 'new' ? 'All caught up. No new requests.' : 'Nothing here yet.') : 'No requests yet. When someone sends a message or a request on the website, it shows up here.'}</div>`;
+      return;
+    }
+    list.innerHTML = rows.map((r) => {
+      const done = r.status === 'handled';
+      const det = Object.keys(r.details || {}).filter((k) => r.details[k] && k !== 'request').map((k) => `<span>${esc(LABELS[k] || k)}: <b>${esc(r.details[k])}</b></span>`).join('');
+      const subject = encodeURIComponent(`Hammer Boxing & Fitness: your ${(KINDS[r.kind] || 'message').toLowerCase()}`);
+      return `<article class="req ${done ? 'is-handled' : ''}">
+        <div class="req__head"><span class="pill pill--${esc(r.kind)}">${esc(KINDS[r.kind] || r.kind)}</span>${done ? '<span class="pill pill--done">Handled</span>' : ''}
+          <span class="req__name">${esc(r.name)}</span><time class="req__time" datetime="${esc(r.created_at)}">${esc(when.format(new Date(r.created_at)))}</time></div>
+        <div class="req__contact"><a href="mailto:${esc(r.email)}?subject=${subject}">${esc(r.email)}</a>${r.phone ? `<a href="tel:${esc(String(r.phone).replace(/[^0-9+]/g, ''))}">${esc(r.phone)}</a>` : ''}</div>
+        ${det ? `<p class="req__details">${det}</p>` : ''}
+        ${r.message ? `<p class="req__msg">${esc(r.message)}</p>` : ''}
+        <div class="req__actions">
+          <a class="btn btn--ghost btn--sm" href="mailto:${esc(r.email)}?subject=${subject}">Reply by email</a>
+          <button class="btn btn--sm ${done ? 'btn--ghost' : ''}" type="button" data-toggle="${esc(r.id)}" ${S.busy[r.id] ? 'disabled' : ''}>${done ? 'Move back to new' : 'Mark handled'}</button>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  async function toggle(id) {
+    const r = S.rows.find((x) => String(x.id) === id); if (!r || S.busy[id]) return;
+    const next = r.status === 'handled' ? 'new' : 'handled';
+    S.busy[id] = true; render();
+    try {
+      const out = await api(`requests?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ status: next, handled_at: next === 'handled' ? new Date().toISOString() : null }) });
+      if (out && out[0]) Object.assign(r, out[0]); else r.status = next;
+      $('[data-app-error]').hidden = true;
+    } catch (e) {
+      if (e.message !== '401') { const b = $('[data-app-error]'); b.hidden = false; b.textContent = 'That change did not save. Try again. (' + e.message + ')'; }
+    }
+    delete S.busy[id]; render();
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-toggle]'); if (t) { toggle(t.dataset.toggle); return; }
+    const f = e.target.closest('[data-filter]'); if (f) { S.filter = f.dataset.filter; render(); return; }
+    if (e.target.closest('[data-refresh]')) { load(); return; }
+    if (e.target.closest('[data-signout]')) signOut();
+  });
+  $('[data-search]').addEventListener('input', (e) => { S.q = e.target.value; render(); });
+  $('[data-login-form]').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const em = $('#em').value.trim(), pw = $('#pw').value, err = $('[data-login-error]'), btn = $('[data-login-btn]');
+    if (!em || !pw) { err.hidden = false; err.textContent = 'Enter your email and password.'; return; }
+    btn.disabled = true; btn.textContent = 'Signing in…'; err.hidden = true;
+    try {
+      S.session = await auth('password', { email: em, password: pw }); saveSession();
+      $('#pw').value = ''; enterApp();
+    } catch (ex) {
+      err.hidden = false;
+      err.textContent = ex.status === 400 ? 'That email and password do not match a staff account.' : 'Could not reach the sign-in service. Check your connection and try again.';
+    }
+    btn.disabled = false; btn.textContent = 'Sign in';
+  });
+  function enterApp() { $('[data-email]').textContent = S.session.email || ''; show('app'); load(); }
+
+  if (!URL_ || !KEY) { show('setup'); return; }
+  S.session = loadSession();
+  if (S.session) enterApp(); else show('login');
+  setInterval(() => { if (S.session && !document.hidden) load(); }, 60000);
+})();
+</script>
+</body>
+</html>

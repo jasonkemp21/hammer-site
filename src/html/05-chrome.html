@@ -1,0 +1,51 @@
+<header class="head">
+  <div class="head__in">
+    <a class="brand" href="#home" data-route="home" aria-label="Hammer Boxing and Fitness, home">
+      <img class="brand__mark" src="img/logo-mark-white.webp" width="354" height="269" alt="">
+      <img class="brand__word" src="img/logo-word-white.webp" width="838" height="237" alt="">
+      <span class="brand__sub">Boxing<br>&amp; Fitness</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#schedule" data-route="schedule">Schedule</a>
+      <a href="#programs" data-route="programs">Programs</a>
+      <a href="#pricing" data-route="pricing">Pricing</a>
+      <a href="#coaches" data-route="coaches">Coaches</a>
+      <a href="#train" data-route="train">Round Timer</a>
+      <a href="#shop" data-route="shop">Shop</a>
+      <a href="#visit" data-route="visit">Visit</a>
+    </nav>
+    <div class="head__actions">
+      <button class="btn btn--primary btn--sm head__book" type="button" data-action="book">Book a class</button>
+      <button class="iconbtn iconbtn--bare head__menu" type="button" data-action="menu-open" aria-label="Open menu" aria-haspopup="dialog">
+        <svg class="i"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <div class="menu__top">
+    <a class="brand" href="#home" data-route="home" aria-label="Home">
+      <img class="brand__mark" src="img/logo-mark-white.webp" width="354" height="269" alt="">
+      <img class="brand__word" src="img/logo-word-white.webp" width="838" height="237" alt="">
+    </a>
+    <button class="iconbtn" type="button" data-action="menu-close" aria-label="Close menu"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <nav class="menu__links" aria-label="Menu">
+    <a href="#schedule" data-route="schedule">Schedule <span>This week's classes</span></a>
+    <a href="#programs" data-route="programs">Programs <span>Seven ways to train</span></a>
+    <a href="#pricing" data-route="pricing">Pricing <span>Classes, memberships, privates</span></a>
+    <a href="#coaches" data-route="coaches">Coaches <span>Tale of the tape</span></a>
+    <a href="#train" data-route="train">Round Timer <span>Free tool</span></a>
+    <a href="#shop" data-route="shop">Shop <span>Gear and merch</span></a>
+    <a href="#haven" data-route="haven">Hammer's Haven <span>Youth boxing</span></a>
+    <a href="#visit" data-route="visit">Visit <span>Hours, map, FAQ</span></a>
+  </nav>
+  <div class="menu__foot">
+    <span class="pill menu__status" data-open-status><span class="pill__dot"></span>Hours</span>
+    <p class="small muted">525 W. North Ave., Chicago · <span class="nowrap">(312) 573-1950</span></p>
+    <button class="btn btn--primary btn--block" type="button" data-action="book">Book a class</button>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">

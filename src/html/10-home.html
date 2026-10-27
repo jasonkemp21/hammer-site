@@ -1,0 +1,249 @@
+<section class="view" data-view="home" aria-label="Home">
+
+  <!-- ============ HERO ============ -->
+  <div class="band band--ink hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="label label--fg"><svg class="star" aria-hidden="true"><use href="#i-star"/></svg> Old Town, Chicago <span class="muted">North &amp; Mohawk</span></p>
+        <div class="lockup"><h1><span>Hit like a</span> <span class="lockup__2">Hammer.</span></h1></div>
+        <p class="lede">Real boxing, taught by fighters. 55-minute classes for every level, six days a week.</p>
+        <div class="btn-row">
+          <button class="btn btn--primary btn--lg" type="button" data-action="buy" data-item="intro">3 classes for $30 <svg class="i i--go" aria-hidden="true"><use href="#i-go"/></svg></button>
+          <a class="btn btn--ghost btn--lg" href="#schedule" data-route="schedule">See the schedule</a>
+        </div>
+        <p class="small muted hero__fine">Intro offer for new clients. Gloves and wraps rent for $5. Sparring is always optional.</p>
+      </div>
+      <div class="hero__media">
+        <img class="hero__img" src="img/hero-ring.webp" width="1040" height="1300" alt="A Hammer coach holds a punch paddle for a boxer working inside the ring." fetchpriority="high">
+        <div class="bellcard" data-bellcard>
+          <p class="label">Next bell</p>
+          <p class="bellcard__time">7:00 AM</p>
+          <p class="small">Boxing, Monday to Friday at 7 AM, 12 PM, 5 PM and 6 PM. Saturday at 10 AM.</p>
+        </div>
+      </div>
+    </div>
+    <div class="wrap hero__proof">
+      <ul class="proof">
+        <li><b>4.9</b><span>on ClassPass <small>1,000+ ratings</small></span></li>
+        <li><b>3</b><span>Golden Gloves champions <small>and 5 finalists, Chicago</small></span></li>
+        <li><b>A+</b><span>Better Business Bureau <small>rating</small></span></li>
+        <li><b>6</b><span>days a week <small>first bell 7 AM</small></span></li>
+      </ul>
+    </div>
+    <div class="ropes" aria-hidden="true"></div>
+  </div>
+
+  <!-- ============ TODAY'S CARD ============ -->
+  <div class="band band--paper" id="card">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="label" data-card-date>This week</p>
+          <h2 class="h-xl" data-card-title>Today's card</h2>
+        </div>
+        <div class="sec-head__aside">
+          <p class="small muted" data-card-sub>First bell 7:00 AM. Last bell 6:00 PM.</p>
+          <a class="link" href="#schedule" data-route="schedule">Full week and filters</a>
+        </div>
+      </div>
+      <div class="daytabs" data-daytabs="home" role="tablist" aria-label="Pick a day"></div>
+      <div class="bouts" data-bouts="home"></div>
+      <p class="micro muted bouts__foot">Boxing classes are 55 minutes of instruction in a one-hour slot. Coach assignments mirror the gym's Mindbody calendar for the week of October 12, 2026.</p>
+    </div>
+  </div>
+
+  <!-- ============ WAYS TO TRAIN ============ -->
+  <div class="band band--ink" id="ways">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="label">Ways to train</p>
+          <h2 class="h-xl">Pick your <em>fight</em></h2>
+        </div>
+        <div class="sec-head__aside">
+          <p class="small muted">Seven ways in. Every one of them starts with proper form.</p>
+          <a class="link" href="#programs" data-route="programs">Compare all programs</a>
+        </div>
+      </div>
+      <div class="progs" data-progs></div>
+    </div>
+  </div>
+
+  <!-- ============ FIRST TIMERS ============ -->
+  <div class="band band--red first" id="first">
+    <div class="wrap">
+      <div class="first__grid">
+        <div class="first__head">
+          <p class="label">Your first day</p>
+          <h2 class="h-xl">Never boxed? <em>Start here.</em></h2>
+          <p class="lede">Every group class welcomes all skill levels and is beginner friendly. Here is what a first day looks like.</p>
+          <div class="btn-row">
+            <button class="btn btn--primary" type="button" data-action="quiz-open">Find your corner <svg class="i i--go" aria-hidden="true"><use href="#i-go"/></svg></button>
+            <a class="link" href="#visit" data-route="visit" data-scroll="faq">Read the FAQ</a>
+          </div>
+        </div>
+        <ul class="facts">
+          <li><h3 class="h-s">All levels, one class</h3><p>Classes are for beginners and trained fighters alike. Proper form and technique come first.</p></li>
+          <li><h3 class="h-s">Sparring is optional</h3><p>Full-contact sparring is available to all and never forced on anyone.</p></li>
+          <li><h3 class="h-s">Gear is handled</h3><p>Bring a towel and a water bottle. Gloves and wraps rent for $5 if you do not have your own.</p></li>
+          <li><h3 class="h-s">Showers and lockers</h3><p>Both are on site, so a 7 AM or noon class fits into a workday.</p></li>
+        </ul>
+      </div>
+      <div class="ticket">
+        <div class="ticket__main">
+          <p class="label">New client intro</p>
+          <p class="ticket__offer"><b>3 classes</b> <span>for</span> <b>$30</b></p>
+          <p class="small">Three group classes for the price of one. For new clients.</p>
+        </div>
+        <div class="ticket__stub">
+          <p class="ticket__admit data">ADMIT ONE &times;3</p>
+          <button class="btn btn--primary" type="button" data-action="buy" data-item="intro">Claim the offer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COACHES ============ -->
+  <div class="band band--paper corner" id="corner">
+    <div class="wrap corner__head">
+      <div class="sec-head">
+        <div>
+          <p class="label">The coaches</p>
+          <h2 class="h-xl">In your <em>corner</em></h2>
+        </div>
+        <div class="sec-head__aside">
+          <p class="small muted">A former pro, an active amateur, a kickboxing competitor and a college athlete. All four teach form first.</p>
+          <a class="link" href="#coaches" data-route="coaches">Meet all four</a>
+        </div>
+      </div>
+    </div>
+    <div class="wall" data-wall></div>
+  </div>
+
+  <!-- ============ PRICING ============ -->
+  <div class="band band--paper" id="cost">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="label">Pricing</p>
+          <h2 class="h-xl">What it <em>costs</em></h2>
+        </div>
+        <div class="sec-head__aside">
+          <p class="small muted">Every price in one place. Set how often you will train and see what a class works out to.</p>
+          <a class="link" href="#pricing" data-route="pricing">All memberships and packages</a>
+        </div>
+      </div>
+      <div class="calc" data-calc="home"></div>
+    </div>
+  </div>
+
+  <!-- ============ ROUND TIMER ============ -->
+  <div class="band band--ink" id="bell">
+    <div class="wrap bellband">
+      <div class="bellband__copy">
+        <p class="label">Free tool</p>
+        <h2 class="h-xl">Take the <em>bell</em> home</h2>
+        <p class="lede">A round timer with a combo caller, made for shadow boxing in your living room. Three minutes on, one minute off.</p>
+        <div class="btn-row">
+          <a class="btn btn--ghost" href="#train" data-route="train">Open the full timer</a>
+        </div>
+      </div>
+      <div class="timer timer--mini" data-timer="mini"></div>
+    </div>
+  </div>
+
+  <!-- ============ REVIEWS ============ -->
+  <div class="band band--paper" id="word">
+    <div class="wrap reviews">
+      <div class="reviews__score">
+        <p class="label">From the members</p>
+        <p class="reviews__num">4.9</p>
+        <div class="reviews__stars" role="img" aria-label="4.9 out of 5">
+          <svg class="star"><use href="#i-star"/></svg><svg class="star"><use href="#i-star"/></svg><svg class="star"><use href="#i-star"/></svg><svg class="star"><use href="#i-star"/></svg><svg class="star"><use href="#i-star"/></svg>
+        </div>
+        <p class="small">Average on ClassPass from <b>1,000+ ratings</b>.</p>
+        <a class="link small" href="https://classpass.com/studios/hammer-fitness-and-boxing-chicago" target="_blank" rel="noopener">See the listing</a>
+      </div>
+      <div class="reviews__body">
+      <div class="quotes">
+        <figure class="quote quote--lead">
+          <blockquote>&ldquo;This isn&rsquo;t an Instagram gym where you&rsquo;ll just hit bags under strobe lights. The trainers do a great job focusing on developing boxing technique.&rdquo;</blockquote>
+          <figcaption>Caleb S.</figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>&ldquo;Really patient and professional instructors. The lockers are clean and pristine and so far all the folks in my classes are very friendly.&rdquo;</blockquote>
+          <figcaption>Vivian Z.</figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>&ldquo;If you&rsquo;re looking for a gym where you can learn how to box (and for real, not the weird cardio stuff), get stronger, and have fun in a supportive and clean environment, check out Hammer Fitness and Boxing.&rdquo;</blockquote>
+          <figcaption>Theresa C.</figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>&ldquo;If you would like a fantastic workout, achieve new workout skills and get into shape - it is the place to go!&rdquo;</blockquote>
+          <figcaption>Hedda H.</figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>&ldquo;I&rsquo;ve never been in such great shape because of Hammer Fitness!&rdquo;</blockquote>
+          <figcaption>Mary H.</figcaption>
+        </figure>
+      </div>
+      <p class="micro muted reviews__src">Excerpts from the testimonials on the gym's own site.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GOLDEN GLOVES ============ -->
+  <div class="band band--ink gloves" id="gloves">
+    <div class="wrap gloves__grid">
+      <div class="gloves__copy">
+        <p class="label gloves__label"><svg class="star" aria-hidden="true"><use href="#i-star"/></svg> Chicago Golden Gloves</p>
+        <h2 class="h-xl"><span>5 finalists.</span> <em>3 champions.</em></h2>
+        <p class="lede">Most members never plan to fight, and that is fine with us. When someone walks in with the fire to compete, we know how to feed it.</p>
+        <p class="small muted">Sparring runs Saturdays at 11 AM. Champions built from the ground up, and experienced fighters sharpened.</p>
+        <div class="btn-row">
+          <button class="btn btn--ghost" type="button" data-action="inquire" data-kind="compete">Talk to Johnny about competing</button>
+        </div>
+      </div>
+      <div class="gloves__photos">
+        <img src="img/gg-1.webp" width="800" height="1000" loading="lazy" alt="A Hammer boxer in blue holds a trophy at the 2024 Chicago Golden Gloves with his corner.">
+        <img src="img/gg-2.webp" width="800" height="1000" loading="lazy" alt="A Hammer boxer and his coach hold a trophy after a tournament bout.">
+        <img src="img/gg-3.webp" width="800" height="1000" loading="lazy" alt="Hammer fighters and coaches celebrate with a trophy.">
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HAMMER'S HAVEN ============ -->
+  <div class="band band--white haven-teaser" id="haven-teaser">
+    <div class="wrap haven-teaser__grid">
+      <div>
+        <p class="label">Not-for-profit, same address</p>
+        <h2 class="h-l">Hammer's <em>Haven</em></h2>
+      </div>
+      <div class="haven-teaser__body">
+        <p class="lede">Youth boxing, mentoring and skill building, every weekday afternoon. Its mission is to save inner-city youth from violence through boxing and mentoring.</p>
+        <div class="btn-row">
+          <a class="btn btn--solid" href="#haven" data-route="haven">About the Haven</a>
+          <a class="link" href="https://hammershaven.org/giving-to-hammers-haven" target="_blank" rel="noopener">Give to Hammer's Haven</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VISIT ============ -->
+  <div class="band band--ink" id="find">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="label">Find us</p>
+          <h2 class="h-xl">North <em>&amp;</em> Mohawk</h2>
+        </div>
+        <div class="sec-head__aside">
+          <span class="pill" data-open-status><span class="pill__dot"></span>Hours</span>
+          <a class="link" href="#visit" data-route="visit">Hours, transit and FAQ</a>
+        </div>
+      </div>
+      <div class="visit" data-visit="home"></div>
+    </div>
+  </div>
+
+</section>

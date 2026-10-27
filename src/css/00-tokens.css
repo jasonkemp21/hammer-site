@@ -1,0 +1,55 @@
+/* Layout: a fight card. Full-bleed bands of ceiling-black, brick-white and wall-red on a 12-column grid;
+   condensed poster heads hang left and the facts run in ruled rows, like a bout sheet. One fixed look:
+   the page is its own poster, so it does not follow the viewer's light or dark theme. */
+:root {
+  color-scheme: dark;
+
+  /* Color: lifted from the gym itself */
+  --ink: #110D0D;        /* the black ceiling */
+  --ink-2: #1C1617;      /* raised surface on ink */
+  --ink-3: #2B2224;      /* controls and rules on ink */
+  --paper: #F6F3F1;      /* painted white brick */
+  --paper-2: #EBE6E3;    /* shaded brick */
+  --white: #FFFFFF;
+  --red: #D81E26;        /* the red wall and the ring canvas */
+  --red-deep: #A7141B;   /* pressed red, tone-on-tone type */
+  --red-lift: #FF5C61;   /* red that reads as small text on ink */
+  --blue: #45B4E8;       /* Chicago flag blue: the other corner, and the focus ring */
+  --gold: #E0B341;       /* Golden Gloves only */
+  --go: #39B868;         /* open-now signal */
+  --on-ink-mute: #B7ABA9;
+  --on-paper-mute: #5C5250;
+  --line-ink: #3A2F31;
+  --line-paper: #D6CEC9;
+
+  /* Type: Chicago's own display face, an American gothic for reading, a mono for the clock */
+  --display: "Big Shoulders Display", "Arial Narrow", "Helvetica Neue Condensed", Impact, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --data: "Chivo Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  /* Scale */
+  --t-micro: .75rem;
+  --t-small: .875rem;
+  --t-body: 1.0625rem;
+  --t-lede: clamp(1.125rem, .6vw + 1rem, 1.3125rem);
+  --h-s: clamp(1.5rem, 1.2vw + 1.1rem, 2rem);
+  --h-m: clamp(2rem, 2.6vw + 1.2rem, 3.25rem);
+  --h-l: clamp(2.75rem, 5vw + 1.2rem, 5.25rem);
+  --h-xl: clamp(3.25rem, 8vw + 1rem, 8rem);
+
+  /* Space */
+  --gutter: clamp(16px, 4vw, 40px);
+  --max: 1240px;
+  --band-y: clamp(56px, 8vw, 112px);
+  --head-h: 68px;
+}
+
+/* Each band (and each paper or ink surface dropped onto another band) sets its own ground and inks.
+   Components read these and never raw colors, so they hold up on any band. */
+.band, .on-paper, .on-ink, .on-red { background: var(--bg); color: var(--fg); }
+.band { position: relative; }
+.band--ink, .on-ink { --bg: var(--ink); --fg: var(--paper); --mute: var(--on-ink-mute); --line: var(--line-ink); --surface: var(--ink-2); --surface-2: var(--ink-3); --accent: var(--red); --accent-text: var(--red-lift); --em: var(--red); --btn-bg: var(--red); --btn-fg: #fff; --btn-hover: var(--red-deep); --star: var(--red); color-scheme: dark; }
+.band--ink2 { --bg: var(--ink-2); --fg: var(--paper); --mute: var(--on-ink-mute); --line: var(--line-ink); --surface: var(--ink); --surface-2: var(--ink-3); --accent: var(--red); --accent-text: var(--red-lift); --em: var(--red); --btn-bg: var(--red); --btn-fg: #fff; --btn-hover: var(--red-deep); --star: var(--red); color-scheme: dark; }
+.band--paper, .on-paper { --bg: var(--paper); --fg: var(--ink); --mute: var(--on-paper-mute); --line: var(--line-paper); --surface: var(--white); --surface-2: var(--paper-2); --accent: var(--red); --accent-text: var(--red-deep); --em: var(--red); --btn-bg: var(--red); --btn-fg: #fff; --btn-hover: var(--red-deep); --star: var(--red); color-scheme: light; }
+.band--white { --bg: var(--white); --fg: var(--ink); --mute: var(--on-paper-mute); --line: var(--line-paper); --surface: var(--paper); --surface-2: var(--paper-2); --accent: var(--red); --accent-text: var(--red-deep); --em: var(--red); --btn-bg: var(--red); --btn-fg: #fff; --btn-hover: var(--red-deep); --star: var(--red); color-scheme: light; }
+.band--red, .on-red { --bg: var(--red); --fg: var(--white); --mute: #FFE3E4; --line: rgba(255, 255, 255, .36); --surface: var(--red-deep); --surface-2: #8E0F15; --accent: var(--ink); --accent-text: var(--white); --em: var(--ink); --btn-bg: var(--ink); --btn-fg: var(--paper); --btn-hover: #000; --star: var(--ink); color-scheme: dark; }
