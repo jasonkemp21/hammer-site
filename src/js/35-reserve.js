@@ -74,24 +74,26 @@ function renderReserve() {
     const upcoming = allUpcoming(week).filter((x) => x.type.bookable).slice(0, 24);
     const firstClass = r.mode === 'item' && item && CLASS_ITEMS.indexOf(item.id) >= 0
       ? `<div class="field field--full"><label for="rv-first-class">Your first class <span class="muted">(optional)</span></label><select class="select" id="rv-first-class"><option value="">I will pick one later</option>${upcoming.map((x) => `<option value="${x.key}" ${x.key === r.firstClass ? 'selected' : ''}>${esc(classWith(x))}, ${esc(classLine(x))}</option>`).join('')}</select></div>` : '';
-    const passPick = r.mode === 'class' ? `<div class="field field--full"><label for="rv-pass">What will you use for this class?</label><select class="select" id="rv-pass">${PASS_CHOICES.map(([id, label]) => `<option value="${id}" ${r.pass === id ? 'selected' : ''}>${label}</option>`).join('')}</select></div>` : '';
-    html = sheetHead('Pay at the gym', r.mode === 'class' ? 'Reserve your spot' : 'Reserve your pass', 'book-title') + `<form class="sheet__body" data-form="reserve" novalidate>
+    const kids = !!(c && c.type.deskOnly);
+    const passPick = r.mode === 'class' && !kids ? `<div class="field field--full"><label for="rv-pass">What will you use for this class?</label><select class="select" id="rv-pass">${PASS_CHOICES.map(([id, label]) => `<option value="${id}" ${r.pass === id ? 'selected' : ''}>${label}</option>`).join('')}</select></div>` : '';
+    html = sheetHead(kids ? 'Kids Boxing · pay at the gym' : 'Pay at the gym', kids ? 'Reserve a spot for your child' : r.mode === 'class' ? 'Reserve your spot' : 'Reserve your pass', 'book-title') + `<form class="sheet__body" data-form="reserve" novalidate>
         ${r.mode === 'class' && c ? `<div class="recap"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span><b>${esc(c.type.name)}</b><span>${esc(classLine(c))}${c.coach ? ' · ' + esc(c.coach.name) : ''}</span></div>` : item ? `<div class="recap"><b>${esc(item.name)}</b><span>${esc(item.price)}</span></div>` : ''}
         <div class="form-grid">
-          ${field('rv-fn', 'First name', f.first, { auto: 'given-name', error: e.first })}
-          ${field('rv-ln', 'Last name', f.last, { auto: 'family-name', error: e.last })}
+          ${field('rv-fn', kids ? 'Parent first name' : 'First name', f.first, { auto: 'given-name', error: e.first })}
+          ${field('rv-ln', kids ? 'Parent last name' : 'Last name', f.last, { auto: 'family-name', error: e.last })}
           ${field('rv-em', 'Email', f.email, { type: 'email', auto: 'email', inputmode: 'email', error: e.email })}
           ${field('rv-ph', 'Mobile', f.phone, { type: 'tel', auto: 'tel', inputmode: 'tel', error: e.phone })}
           ${passPick}${firstClass}
-          <label class="check field--full"><input type="checkbox" id="rv-first" ${r.first ? 'checked' : ''}><span><b>This is my first time at Hammer</b><br><span class="muted">New clients get 3 classes for $30 and 25% off packages.</span></span></label>
+          ${kids ? field('rv-child', 'Child’s name and age', f.child || '', { full: true, error: e.child, placeholder: 'e.g. Sam, 10' }) : ''}
+          <label class="check field--full"><input type="checkbox" id="rv-first" ${r.first ? 'checked' : ''}><span><b>${kids ? 'First time at Hammer for my child' : 'This is my first time at Hammer'}</b><br><span class="muted">${kids ? 'The desk will go over pricing when you come in.' : 'New clients get 3 classes for $30 and 25% off packages.'}</span></span></label>
           ${r.mode === 'class' ? `<label class="check field--full"><input type="checkbox" id="rv-rental" ${r.rental ? 'checked' : ''}><span><b>I need gloves and wraps</b><br><span class="muted">The gym rents them for $5.</span></span></label>` : ''}
           <div class="field field--full"><label for="rv-note">Anything we should know? <span class="muted">(optional)</span></label><textarea class="textarea" id="rv-note" maxlength="4000">${esc(f.note)}</textarea></div>
         </div>
         ${honeypot()}
-        <p class="small muted">The front desk will have your reservation. Pay when you arrive, by cash or card.</p>
+        <p class="small muted">${kids ? 'Kids Boxing is reserved through the front desk. Pay when you come in, by cash or card.' : 'The front desk will have your reservation. Pay when you arrive, by cash or card.'}</p>
         ${r.failed ? sendFailed() : ''}
       </form>
-      <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="rv-how">${icon('back')} Back</button>
+      <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="${kids ? 'rv-pick' : 'rv-how'}">${icon('back')} Back</button>
         <button class="btn btn--primary" type="button" data-action="rv-send" ${r.sending ? 'disabled' : ''}>${r.sending ? 'Sending…' : (r.mode === 'class' ? 'Reserve my spot' : 'Reserve it')}</button></footer>`;
   }
 
@@ -127,7 +129,7 @@ function renderReserve() {
 }
 function readReserve() {
   const g = (id) => { const el = $('#' + id); return el ? el.value : ''; };
-  if ($('#rv-fn')) Reserve.form = { first: g('rv-fn'), last: g('rv-ln'), email: g('rv-em'), phone: g('rv-ph'), note: g('rv-note') };
+  if ($('#rv-fn')) Reserve.form = { first: g('rv-fn'), last: g('rv-ln'), email: g('rv-em'), phone: g('rv-ph'), note: g('rv-note'), child: g('rv-child') };
   if ($('#rv-pass')) Reserve.pass = g('rv-pass');
   if ($('#rv-first-class')) Reserve.firstClass = g('rv-first-class');
   if ($('#rv-first')) Reserve.first = $('#rv-first').checked;
@@ -141,7 +143,7 @@ function openReserve(mode, opts) {
     if ((!c || c.startsIn <= 0) && opts.type) c = nextClass(WEEKVIEW, (x) => x.type.id === opts.type);
     if (c && c.startsIn <= 0) c = null;
     r.key = c ? c.key : null; r.dayN = c ? c.n : 0; r.item = null;
-    r.step = c ? 'how' : 'pick';
+    r.step = c ? (c.type.deskOnly ? 'form' : 'how') : 'pick';
   } else {
     r.item = opts.item; r.key = null; r.step = 'how';
     if (!itemInfo(r.item)) { openOut(GYM.store); return; }
@@ -154,20 +156,21 @@ Object.assign(actions, {
   'buy': (el) => openReserve('item', { item: (el && el.dataset.item) || 'single' }),
   'rv-day': (el) => { Reserve.dayN = +el.dataset.n; const d = WEEKVIEW.days[Reserve.dayN]; const first = d.classes.find((x) => x.type.bookable && x.startsIn > 0); Reserve.key = first ? first.key : null; renderReserve(); },
   'rv-pick': () => { Reserve.step = 'pick'; renderReserve(); },
-  'rv-how': () => { readReserve(); if (Reserve.mode === 'class' && !Reserve.key) return; Reserve.step = 'how'; Reserve.failed = false; renderReserve(); const h = $('[data-ov="book"] h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } },
+  'rv-how': () => { readReserve(); if (Reserve.mode === 'class' && !Reserve.key) return; const cc = reserveClass(); Reserve.step = cc && cc.type.deskOnly ? 'form' : 'how'; Reserve.failed = false; renderReserve(); const h = $('[data-ov="book"] h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } },
   'rv-form': () => { Reserve.step = 'form'; renderReserve(); const i = $('#rv-fn'); if (i) i.focus(); },
   'rv-mindbody': () => { const c = reserveClass(); Overlay.close(true); openOut(Reserve.mode === 'class' ? mindbodySchedule(c ? c.date : null) : GYM.store); },
   'rv-send': async () => {
     const r = Reserve; if (r.sending) return; readReserve();
     const ok1 = validateContact(r.form, r);
     if (!/\d{7,}/.test(r.form.phone.replace(/\D/g, ''))) r.errors.phone = 'Enter a mobile number so the desk can reach you.';
-    if (!ok1 || r.errors.phone) { renderReserve(); const bad = $('[data-ov="book"] .has-error input'); if (bad) bad.focus(); return; }
+    const kidsC = reserveClass(); if (r.mode === 'class' && kidsC && kidsC.type.deskOnly && !(r.form.child || '').trim()) r.errors.child = 'Tell us your child’s name and age.';
+    if (!ok1 || r.errors.phone || r.errors.child) { renderReserve(); const bad = $('[data-ov="book"] .has-error input'); if (bad) bad.focus(); return; }
     const c = reserveClass(); const item = itemInfo(r.item); const f = r.form;
     if (r.mode === 'class' && !c) { r.step = 'pick'; renderReserve(); return; }
     const details = { pay: 'At the gym' };
     if (r.mode === 'class') {
       details.class = c.type.name; details.when = classLine(c); if (c.coach) details.coach = c.coach.name;
-      details.pass = (PASS_CHOICES.find((p) => p[0] === r.pass) || PASS_CHOICES[3])[1];
+      if (c.type.deskOnly) details.child = (f.child || '').trim(); else details.pass = (PASS_CHOICES.find((p) => p[0] === r.pass) || PASS_CHOICES[3])[1];
     } else {
       details.item = item.name; details.price = item.price;
       const fc = r.firstClass ? findClass(r.firstClass) : null; if (fc) details.first_class = `${classWith(fc)}, ${classLine(fc)}`;
@@ -178,7 +181,7 @@ Object.assign(actions, {
     r.sending = true; r.failed = false; renderReserve();
     const ok = await sendRequest(r.mode === 'class' ? 'booking' : 'purchase', { name: `${f.first.trim()} ${f.last.trim()}`, email: f.email, phone: f.phone, message: f.note }, details, trap);
     r.sending = false;
-    if (ok) { r.done = { cls: c, item, first: f.first.trim(), rental: r.rental }; r.step = 'done'; r.form = { first: '', last: '', email: '', phone: '', note: '' }; r.firstClass = ''; r.rental = false; }
+    if (ok) { r.done = { cls: c, item, first: f.first.trim(), rental: r.rental }; r.step = 'done'; r.form = { first: '', last: '', email: '', phone: '', note: '', child: '' }; r.firstClass = ''; r.rental = false; }
     else r.failed = true;
     renderReserve();
   },

@@ -44,7 +44,7 @@ const COACHES = {
       ['Started boxing', 'Age 15'],
       ['Coaching here since', '2011'],
       ['Certified', 'NASM personal trainer'],
-      ['Teaches', 'Group boxing, Lunch-Time Boxing, private boxing'],
+      ['Teaches', 'Group boxing, Hammer Hip House Boxing, private boxing'],
     ],
     bio: [
       'Johnny started boxing at 15, when his godbrother took him to a gym. He loved the smell of the leather and the sound of his punches on the bag. His trainer, the first person he ever sparred with, praised his right hand, then had to stop sparring with him after three sessions because he hit too hard.',
@@ -66,7 +66,7 @@ const COACHES = {
       ['Degree', 'Business and Criminal Justice, double major'],
       ['Learned from', 'His father, Johnny Higgins Jr.'],
       ['Certified', 'NASM personal trainer'],
-      ['Teaches', 'Group boxing, Lunch-Time Boxing, personal training'],
+      ['Teaches', 'Group boxing, Hammer Hip House Boxing, personal training'],
     ],
     bio: [
       'JJ grew up in a boxing gym, watching his father train for fights and picking up the sport as he went. He chose football and became a starting college player at Dubuque, then graduated with a double major in Business and Criminal Justice.',
@@ -123,8 +123,8 @@ const CLASS_TYPES = {
     blurb: 'Proper punching technique, plus the defensive movement to evade and block what comes back. Bodyweight exercises are paired with boxing drills throughout.',
   },
   lunch: {
-    id: 'lunch', name: 'Lunch-Time Boxing', tag: 'lunch', mins: 60, level: 'All levels', bookable: true,
-    blurb: 'A one-hour noon class for flexible schedules. Boxing fundamentals and self-defense, plus a real workout.',
+    id: 'lunch', name: 'Hammer Hip House Boxing', tag: 'lunch', mins: 60, level: 'All levels', bookable: true,
+    blurb: 'The one-hour noon class, with the music turned up. Boxing fundamentals and self-defense, plus a real workout.',
   },
   muaythai: {
     id: 'muaythai', name: 'Muay Thai', tag: 'muaythai', mins: 60, level: 'All levels', bookable: true,
@@ -136,11 +136,11 @@ const CLASS_TYPES = {
     blurb: 'Full-contact sparring. Available to all, never forced on anyone.',
     ask: 'compete', askLabel: 'Ask a coach', noCoach: ['In the ring', 'Available to all, never required'],
   },
-  // added at the gym's request: Mon, Wed, Fri 5 PM. Coach, ages and price are not set yet, so it is enrolled through the desk
+  // Mon, Wed, Fri 5 PM. Not on Mindbody: reserved on the site and paid at the desk. Coach, ages and price still to come from the gym
   kids: {
-    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: '', bookable: false,
-    blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM.',
-    ask: 'kids', askLabel: 'Ask the desk', noCoach: ['Hammer coaches', 'Enroll through the front desk'],
+    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true,
+    blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM. Reserved through the front desk.',
+    noCoach: ['Hammer coaches', 'Reserve a spot, pay at the desk'],
   },
 };
 
@@ -198,8 +198,8 @@ const PROGRAMS = [
     cta: { label: 'Book a class', action: 'book', type: 'boxing' }, classType: 'boxing',
   },
   {
-    id: 'lunch', name: 'Lunch-Time Boxing', img: 'img/p-lunch.webp', alt: 'A midday class shadow boxes beside the ring.',
-    line: 'The noon class for work-from-home days and flexible schedules. In, trained and back by one.',
+    id: 'lunch', name: 'Hammer Hip House Boxing', img: 'img/p-lunch.webp', alt: 'A midday class shadow boxes beside the ring.',
+    line: 'The noon class, with music turned up. For work-from-home days and flexible schedules: in, trained and back by one.',
     when: 'Mon to Fri 12 PM', price: 'Same passes as group boxing',
     body: [
       'A one-hour class at noon, Monday through Friday. It was built for people who work from home, stay-at-home parents and anyone whose day has room in the middle.',
@@ -276,13 +276,13 @@ const FAQ = [
   { id: 'never', q: 'I have never boxed. Can I take a class?', a: 'Yes. Every group class welcomes all skill levels and is beginner friendly. Coaches teach proper form and technique before anything else.' },
   { id: 'bring', q: 'What should I bring?', a: 'Comfortable workout clothes, supportive athletic shoes, a towel and a refillable water bottle. Bring gloves and wraps if you have them. If not, the gym rents them for $5.' },
   { id: 'spar', q: 'Do I have to spar?', a: 'No. Full-contact sparring is available to all but never forced on anyone. Sparring runs Saturdays at 11 AM for those who want it.' },
-  { id: 'long', q: 'How long is a class?', a: 'Boxing classes are 55 minutes of instruction in a one-hour slot. Lunch-Time Boxing and Muay Thai run one hour.' },
+  { id: 'long', q: 'How long is a class?', a: 'Boxing classes are 55 minutes of instruction in a one-hour slot. Hammer Hip House Boxing and Muay Thai run one hour.' },
   { id: 'try', q: 'What does it cost to try it?', a: 'New clients can take 3 classes for $30. After that a single class is $30, a 10-class pack is $250 and unlimited group boxing is $150 a month.' },
   { id: 'expire', q: 'Do packs and packages expire?', a: 'The 10-class pack expires 12 weeks after purchase. Private boxing and personal training packages expire after 90 days.' },
   { id: 'cancel', q: 'What is the cancellation policy for private sessions?', a: 'Give 24 hours’ notice to cancel or move a private boxing or personal training session.' },
   { id: 'showers', q: 'Are there showers, lockers and towels?', a: 'There are showers and lockers. Sweat towels are not provided, so bring your own. Clean towels are for sale at the gym if you forget, and the no-touch water fountains fill a bottle.' },
   { id: 'clean', q: 'How is the gym kept clean?', a: 'Staff sanitize the equipment and the floor after classes and private sessions. Gym Access members wipe down what they use with the cleaning supplies provided. If you are feeling unwell, please stay home.' },
-  { id: 'kids', q: 'Do you train kids and teens?', a: 'Yes. Kids Boxing runs Monday, Wednesday and Friday at 5 PM, and the front desk handles enrollment. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons.' },
+  { id: 'kids', q: 'Do you train kids and teens?', a: 'Yes. Kids Boxing runs Monday, Wednesday and Friday at 5 PM. Reserve a spot from the schedule and pay at the front desk. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons.' },
   { id: 'where', q: 'How do I get there?', a: 'The gym is at 525 W. North Ave., at the corner of North and Mohawk in Old Town. Sedgwick on the Brown Line is about a 4-minute walk. North/Clybourn on the Red Line is about 8 minutes.' },
 ];
 

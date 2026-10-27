@@ -147,7 +147,7 @@ h1 { font: 900 clamp(2.25rem, 6vw, 3.5rem)/.9 var(--display); text-transform: up
   const $ = (s) => document.querySelector(s); const $$ = (s) => Array.from(document.querySelectorAll(s));
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const KINDS = { booking: 'Class reservation', purchase: 'Pass reservation', contact: 'Message', boxing: 'Private boxing', muaythai: 'Private Muay Thai', pt: 'Personal training', compete: 'Competing', kids: 'Kids Boxing' };
-  const LABELS = { request: 'Request', coach: 'Coach', best_times: 'Best times', sessions: 'Sessions', topic: 'Topic', class: 'Class', when: 'When', pass: 'Using', item: 'Item', price: 'Price', first_class: 'First class', first_time: 'First time', rental: 'Rental', pay: 'Pay' };
+  const LABELS = { request: 'Request', coach: 'Coach', best_times: 'Best times', sessions: 'Sessions', topic: 'Topic', class: 'Class', when: 'When', pass: 'Using', item: 'Item', price: 'Price', first_class: 'First class', first_time: 'First time', rental: 'Rental', pay: 'Pay', child: 'Child' };
   const when = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const S = { session: null, rows: [], filter: 'new', kind: 'all', q: '', busy: {} };
 

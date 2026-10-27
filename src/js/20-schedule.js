@@ -1,5 +1,5 @@
 /* ---------- schedule: the bell card, today's card, the week grid, the phone dock ---------- */
-const TAG_LABEL = { boxing: 'Boxing', lunch: 'Lunch-Time', muaythai: 'Muay Thai', sparring: 'Sparring', kids: 'Kids' };
+const TAG_LABEL = { boxing: 'Boxing', lunch: 'Hip House', muaythai: 'Muay Thai', sparring: 'Sparring', kids: 'Kids' };
 let WEEKVIEW = buildWeek();
 
 function coachCell(c) {
@@ -73,7 +73,7 @@ function renderBellCard() {
   el.innerHTML = `<div class="bellcard__top"><span class="label">Next bell</span>
       <span class="pill ${st.open ? 'pill--open' : 'pill--closed'}"><span class="pill__dot"></span>${st.label}</span></div>
     <p class="bellcard__time">${ck.h}:${pad2(ck.m)}<small>${ck.ap} · ${when}</small></p>
-    <p class="bellcard__name">${esc(nx.type.name)}<span>with ${esc(nx.coach.name)} · ${nx.type.mins} min · ${esc(nx.type.level)}</span></p>
+    <p class="bellcard__name">${esc(nx.type.name)}<span>${nx.coach ? 'with ' + esc(nx.coach.name) + ' · ' : ''}${nx.type.mins} min · ${esc(nx.type.level)}</span></p>
     <p class="bellcard__count"><span>Starts in</span><b data-countdown-hms="${nx.key}">${duration(nx.startsIn).hms}</b></p>
     <button class="btn btn--primary btn--block" type="button" data-action="book" data-class="${nx.key}">Book this class ${icon('go', 'i--go')}</button>`;
 }
@@ -100,7 +100,7 @@ function renderStatus() {
 function renderSchedule() {
   const host = $('[data-schedule]'); if (!host) return;
   const f = state.sched; const nx = nextClass(WEEKVIEW);
-  const typeChips = [['all', 'All classes'], ['boxing', 'Boxing'], ['lunch', 'Lunch-Time'], ['muaythai', 'Muay Thai'], ['kids', 'Kids'], ['sparring', 'Sparring']]
+  const typeChips = [['all', 'All classes'], ['boxing', 'Boxing'], ['lunch', 'Hip House'], ['muaythai', 'Muay Thai'], ['kids', 'Kids'], ['sparring', 'Sparring']]
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.type === id}" data-action="sched-type" data-id="${id}">${id === 'all' ? '' : `<span class="tag tag--${id}"></span>`}${label}</button>`).join('');
   const coachChips = [['all', 'Any coach']].concat(COACH_ORDER.map((id) => [id, COACHES[id].first]))
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.coach === id}" data-action="sched-coach" data-id="${id}">${label}</button>`).join('');

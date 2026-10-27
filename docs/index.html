@@ -1776,7 +1776,7 @@ const COACHES = {
       ['Started boxing', 'Age 15'],
       ['Coaching here since', '2011'],
       ['Certified', 'NASM personal trainer'],
-      ['Teaches', 'Group boxing, Lunch-Time Boxing, private boxing'],
+      ['Teaches', 'Group boxing, Hammer Hip House Boxing, private boxing'],
     ],
     bio: [
       'Johnny started boxing at 15, when his godbrother took him to a gym. He loved the smell of the leather and the sound of his punches on the bag. His trainer, the first person he ever sparred with, praised his right hand, then had to stop sparring with him after three sessions because he hit too hard.',
@@ -1798,7 +1798,7 @@ const COACHES = {
       ['Degree', 'Business and Criminal Justice, double major'],
       ['Learned from', 'His father, Johnny Higgins Jr.'],
       ['Certified', 'NASM personal trainer'],
-      ['Teaches', 'Group boxing, Lunch-Time Boxing, personal training'],
+      ['Teaches', 'Group boxing, Hammer Hip House Boxing, personal training'],
     ],
     bio: [
       'JJ grew up in a boxing gym, watching his father train for fights and picking up the sport as he went. He chose football and became a starting college player at Dubuque, then graduated with a double major in Business and Criminal Justice.',
@@ -1855,8 +1855,8 @@ const CLASS_TYPES = {
     blurb: 'Proper punching technique, plus the defensive movement to evade and block what comes back. Bodyweight exercises are paired with boxing drills throughout.',
   },
   lunch: {
-    id: 'lunch', name: 'Lunch-Time Boxing', tag: 'lunch', mins: 60, level: 'All levels', bookable: true,
-    blurb: 'A one-hour noon class for flexible schedules. Boxing fundamentals and self-defense, plus a real workout.',
+    id: 'lunch', name: 'Hammer Hip House Boxing', tag: 'lunch', mins: 60, level: 'All levels', bookable: true,
+    blurb: 'The one-hour noon class, with the music turned up. Boxing fundamentals and self-defense, plus a real workout.',
   },
   muaythai: {
     id: 'muaythai', name: 'Muay Thai', tag: 'muaythai', mins: 60, level: 'All levels', bookable: true,
@@ -1868,11 +1868,11 @@ const CLASS_TYPES = {
     blurb: 'Full-contact sparring. Available to all, never forced on anyone.',
     ask: 'compete', askLabel: 'Ask a coach', noCoach: ['In the ring', 'Available to all, never required'],
   },
-  // added at the gym's request: Mon, Wed, Fri 5 PM. Coach, ages and price are not set yet, so it is enrolled through the desk
+  // Mon, Wed, Fri 5 PM. Not on Mindbody: reserved on the site and paid at the desk. Coach, ages and price still to come from the gym
   kids: {
-    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: '', bookable: false,
-    blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM.',
-    ask: 'kids', askLabel: 'Ask the desk', noCoach: ['Hammer coaches', 'Enroll through the front desk'],
+    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true,
+    blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM. Reserved through the front desk.',
+    noCoach: ['Hammer coaches', 'Reserve a spot, pay at the desk'],
   },
 };
 
@@ -1930,8 +1930,8 @@ const PROGRAMS = [
     cta: { label: 'Book a class', action: 'book', type: 'boxing' }, classType: 'boxing',
   },
   {
-    id: 'lunch', name: 'Lunch-Time Boxing', img: 'img/p-lunch.webp', alt: 'A midday class shadow boxes beside the ring.',
-    line: 'The noon class for work-from-home days and flexible schedules. In, trained and back by one.',
+    id: 'lunch', name: 'Hammer Hip House Boxing', img: 'img/p-lunch.webp', alt: 'A midday class shadow boxes beside the ring.',
+    line: 'The noon class, with music turned up. For work-from-home days and flexible schedules: in, trained and back by one.',
     when: 'Mon to Fri 12 PM', price: 'Same passes as group boxing',
     body: [
       'A one-hour class at noon, Monday through Friday. It was built for people who work from home, stay-at-home parents and anyone whose day has room in the middle.',
@@ -2008,13 +2008,13 @@ const FAQ = [
   { id: 'never', q: 'I have never boxed. Can I take a class?', a: 'Yes. Every group class welcomes all skill levels and is beginner friendly. Coaches teach proper form and technique before anything else.' },
   { id: 'bring', q: 'What should I bring?', a: 'Comfortable workout clothes, supportive athletic shoes, a towel and a refillable water bottle. Bring gloves and wraps if you have them. If not, the gym rents them for $5.' },
   { id: 'spar', q: 'Do I have to spar?', a: 'No. Full-contact sparring is available to all but never forced on anyone. Sparring runs Saturdays at 11 AM for those who want it.' },
-  { id: 'long', q: 'How long is a class?', a: 'Boxing classes are 55 minutes of instruction in a one-hour slot. Lunch-Time Boxing and Muay Thai run one hour.' },
+  { id: 'long', q: 'How long is a class?', a: 'Boxing classes are 55 minutes of instruction in a one-hour slot. Hammer Hip House Boxing and Muay Thai run one hour.' },
   { id: 'try', q: 'What does it cost to try it?', a: 'New clients can take 3 classes for $30. After that a single class is $30, a 10-class pack is $250 and unlimited group boxing is $150 a month.' },
   { id: 'expire', q: 'Do packs and packages expire?', a: 'The 10-class pack expires 12 weeks after purchase. Private boxing and personal training packages expire after 90 days.' },
   { id: 'cancel', q: 'What is the cancellation policy for private sessions?', a: 'Give 24 hours’ notice to cancel or move a private boxing or personal training session.' },
   { id: 'showers', q: 'Are there showers, lockers and towels?', a: 'There are showers and lockers. Sweat towels are not provided, so bring your own. Clean towels are for sale at the gym if you forget, and the no-touch water fountains fill a bottle.' },
   { id: 'clean', q: 'How is the gym kept clean?', a: 'Staff sanitize the equipment and the floor after classes and private sessions. Gym Access members wipe down what they use with the cleaning supplies provided. If you are feeling unwell, please stay home.' },
-  { id: 'kids', q: 'Do you train kids and teens?', a: 'Yes. Kids Boxing runs Monday, Wednesday and Friday at 5 PM, and the front desk handles enrollment. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons.' },
+  { id: 'kids', q: 'Do you train kids and teens?', a: 'Yes. Kids Boxing runs Monday, Wednesday and Friday at 5 PM. Reserve a spot from the schedule and pay at the front desk. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons.' },
   { id: 'where', q: 'How do I get there?', a: 'The gym is at 525 W. North Ave., at the corner of North and Mohawk in Old Town. Sedgwick on the Brown Line is about a 4-minute walk. North/Clybourn on the Red Line is about 8 minutes.' },
 ];
 
@@ -2224,7 +2224,7 @@ const sendFailed = () => `<p class="form-fail" role="alert">${icon('info')}<span
 
 // ---- 20-schedule.js ----
 /* ---------- schedule: the bell card, today's card, the week grid, the phone dock ---------- */
-const TAG_LABEL = { boxing: 'Boxing', lunch: 'Lunch-Time', muaythai: 'Muay Thai', sparring: 'Sparring', kids: 'Kids' };
+const TAG_LABEL = { boxing: 'Boxing', lunch: 'Hip House', muaythai: 'Muay Thai', sparring: 'Sparring', kids: 'Kids' };
 let WEEKVIEW = buildWeek();
 
 function coachCell(c) {
@@ -2298,7 +2298,7 @@ function renderBellCard() {
   el.innerHTML = `<div class="bellcard__top"><span class="label">Next bell</span>
       <span class="pill ${st.open ? 'pill--open' : 'pill--closed'}"><span class="pill__dot"></span>${st.label}</span></div>
     <p class="bellcard__time">${ck.h}:${pad2(ck.m)}<small>${ck.ap} · ${when}</small></p>
-    <p class="bellcard__name">${esc(nx.type.name)}<span>with ${esc(nx.coach.name)} · ${nx.type.mins} min · ${esc(nx.type.level)}</span></p>
+    <p class="bellcard__name">${esc(nx.type.name)}<span>${nx.coach ? 'with ' + esc(nx.coach.name) + ' · ' : ''}${nx.type.mins} min · ${esc(nx.type.level)}</span></p>
     <p class="bellcard__count"><span>Starts in</span><b data-countdown-hms="${nx.key}">${duration(nx.startsIn).hms}</b></p>
     <button class="btn btn--primary btn--block" type="button" data-action="book" data-class="${nx.key}">Book this class ${icon('go', 'i--go')}</button>`;
 }
@@ -2325,7 +2325,7 @@ function renderStatus() {
 function renderSchedule() {
   const host = $('[data-schedule]'); if (!host) return;
   const f = state.sched; const nx = nextClass(WEEKVIEW);
-  const typeChips = [['all', 'All classes'], ['boxing', 'Boxing'], ['lunch', 'Lunch-Time'], ['muaythai', 'Muay Thai'], ['kids', 'Kids'], ['sparring', 'Sparring']]
+  const typeChips = [['all', 'All classes'], ['boxing', 'Boxing'], ['lunch', 'Hip House'], ['muaythai', 'Muay Thai'], ['kids', 'Kids'], ['sparring', 'Sparring']]
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.type === id}" data-action="sched-type" data-id="${id}">${id === 'all' ? '' : `<span class="tag tag--${id}"></span>`}${label}</button>`).join('');
   const coachChips = [['all', 'Any coach']].concat(COACH_ORDER.map((id) => [id, COACHES[id].first]))
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.coach === id}" data-action="sched-coach" data-id="${id}">${label}</button>`).join('');
@@ -2582,24 +2582,26 @@ function renderReserve() {
     const upcoming = allUpcoming(week).filter((x) => x.type.bookable).slice(0, 24);
     const firstClass = r.mode === 'item' && item && CLASS_ITEMS.indexOf(item.id) >= 0
       ? `<div class="field field--full"><label for="rv-first-class">Your first class <span class="muted">(optional)</span></label><select class="select" id="rv-first-class"><option value="">I will pick one later</option>${upcoming.map((x) => `<option value="${x.key}" ${x.key === r.firstClass ? 'selected' : ''}>${esc(classWith(x))}, ${esc(classLine(x))}</option>`).join('')}</select></div>` : '';
-    const passPick = r.mode === 'class' ? `<div class="field field--full"><label for="rv-pass">What will you use for this class?</label><select class="select" id="rv-pass">${PASS_CHOICES.map(([id, label]) => `<option value="${id}" ${r.pass === id ? 'selected' : ''}>${label}</option>`).join('')}</select></div>` : '';
-    html = sheetHead('Pay at the gym', r.mode === 'class' ? 'Reserve your spot' : 'Reserve your pass', 'book-title') + `<form class="sheet__body" data-form="reserve" novalidate>
+    const kids = !!(c && c.type.deskOnly);
+    const passPick = r.mode === 'class' && !kids ? `<div class="field field--full"><label for="rv-pass">What will you use for this class?</label><select class="select" id="rv-pass">${PASS_CHOICES.map(([id, label]) => `<option value="${id}" ${r.pass === id ? 'selected' : ''}>${label}</option>`).join('')}</select></div>` : '';
+    html = sheetHead(kids ? 'Kids Boxing · pay at the gym' : 'Pay at the gym', kids ? 'Reserve a spot for your child' : r.mode === 'class' ? 'Reserve your spot' : 'Reserve your pass', 'book-title') + `<form class="sheet__body" data-form="reserve" novalidate>
         ${r.mode === 'class' && c ? `<div class="recap"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span><b>${esc(c.type.name)}</b><span>${esc(classLine(c))}${c.coach ? ' · ' + esc(c.coach.name) : ''}</span></div>` : item ? `<div class="recap"><b>${esc(item.name)}</b><span>${esc(item.price)}</span></div>` : ''}
         <div class="form-grid">
-          ${field('rv-fn', 'First name', f.first, { auto: 'given-name', error: e.first })}
-          ${field('rv-ln', 'Last name', f.last, { auto: 'family-name', error: e.last })}
+          ${field('rv-fn', kids ? 'Parent first name' : 'First name', f.first, { auto: 'given-name', error: e.first })}
+          ${field('rv-ln', kids ? 'Parent last name' : 'Last name', f.last, { auto: 'family-name', error: e.last })}
           ${field('rv-em', 'Email', f.email, { type: 'email', auto: 'email', inputmode: 'email', error: e.email })}
           ${field('rv-ph', 'Mobile', f.phone, { type: 'tel', auto: 'tel', inputmode: 'tel', error: e.phone })}
           ${passPick}${firstClass}
-          <label class="check field--full"><input type="checkbox" id="rv-first" ${r.first ? 'checked' : ''}><span><b>This is my first time at Hammer</b><br><span class="muted">New clients get 3 classes for $30 and 25% off packages.</span></span></label>
+          ${kids ? field('rv-child', 'Child’s name and age', f.child || '', { full: true, error: e.child, placeholder: 'e.g. Sam, 10' }) : ''}
+          <label class="check field--full"><input type="checkbox" id="rv-first" ${r.first ? 'checked' : ''}><span><b>${kids ? 'First time at Hammer for my child' : 'This is my first time at Hammer'}</b><br><span class="muted">${kids ? 'The desk will go over pricing when you come in.' : 'New clients get 3 classes for $30 and 25% off packages.'}</span></span></label>
           ${r.mode === 'class' ? `<label class="check field--full"><input type="checkbox" id="rv-rental" ${r.rental ? 'checked' : ''}><span><b>I need gloves and wraps</b><br><span class="muted">The gym rents them for $5.</span></span></label>` : ''}
           <div class="field field--full"><label for="rv-note">Anything we should know? <span class="muted">(optional)</span></label><textarea class="textarea" id="rv-note" maxlength="4000">${esc(f.note)}</textarea></div>
         </div>
         ${honeypot()}
-        <p class="small muted">The front desk will have your reservation. Pay when you arrive, by cash or card.</p>
+        <p class="small muted">${kids ? 'Kids Boxing is reserved through the front desk. Pay when you come in, by cash or card.' : 'The front desk will have your reservation. Pay when you arrive, by cash or card.'}</p>
         ${r.failed ? sendFailed() : ''}
       </form>
-      <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="rv-how">${icon('back')} Back</button>
+      <footer class="sheet__foot"><button class="btn btn--ghost" type="button" data-action="${kids ? 'rv-pick' : 'rv-how'}">${icon('back')} Back</button>
         <button class="btn btn--primary" type="button" data-action="rv-send" ${r.sending ? 'disabled' : ''}>${r.sending ? 'Sending…' : (r.mode === 'class' ? 'Reserve my spot' : 'Reserve it')}</button></footer>`;
   }
 
@@ -2635,7 +2637,7 @@ function renderReserve() {
 }
 function readReserve() {
   const g = (id) => { const el = $('#' + id); return el ? el.value : ''; };
-  if ($('#rv-fn')) Reserve.form = { first: g('rv-fn'), last: g('rv-ln'), email: g('rv-em'), phone: g('rv-ph'), note: g('rv-note') };
+  if ($('#rv-fn')) Reserve.form = { first: g('rv-fn'), last: g('rv-ln'), email: g('rv-em'), phone: g('rv-ph'), note: g('rv-note'), child: g('rv-child') };
   if ($('#rv-pass')) Reserve.pass = g('rv-pass');
   if ($('#rv-first-class')) Reserve.firstClass = g('rv-first-class');
   if ($('#rv-first')) Reserve.first = $('#rv-first').checked;
@@ -2649,7 +2651,7 @@ function openReserve(mode, opts) {
     if ((!c || c.startsIn <= 0) && opts.type) c = nextClass(WEEKVIEW, (x) => x.type.id === opts.type);
     if (c && c.startsIn <= 0) c = null;
     r.key = c ? c.key : null; r.dayN = c ? c.n : 0; r.item = null;
-    r.step = c ? 'how' : 'pick';
+    r.step = c ? (c.type.deskOnly ? 'form' : 'how') : 'pick';
   } else {
     r.item = opts.item; r.key = null; r.step = 'how';
     if (!itemInfo(r.item)) { openOut(GYM.store); return; }
@@ -2662,20 +2664,21 @@ Object.assign(actions, {
   'buy': (el) => openReserve('item', { item: (el && el.dataset.item) || 'single' }),
   'rv-day': (el) => { Reserve.dayN = +el.dataset.n; const d = WEEKVIEW.days[Reserve.dayN]; const first = d.classes.find((x) => x.type.bookable && x.startsIn > 0); Reserve.key = first ? first.key : null; renderReserve(); },
   'rv-pick': () => { Reserve.step = 'pick'; renderReserve(); },
-  'rv-how': () => { readReserve(); if (Reserve.mode === 'class' && !Reserve.key) return; Reserve.step = 'how'; Reserve.failed = false; renderReserve(); const h = $('[data-ov="book"] h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } },
+  'rv-how': () => { readReserve(); if (Reserve.mode === 'class' && !Reserve.key) return; const cc = reserveClass(); Reserve.step = cc && cc.type.deskOnly ? 'form' : 'how'; Reserve.failed = false; renderReserve(); const h = $('[data-ov="book"] h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } },
   'rv-form': () => { Reserve.step = 'form'; renderReserve(); const i = $('#rv-fn'); if (i) i.focus(); },
   'rv-mindbody': () => { const c = reserveClass(); Overlay.close(true); openOut(Reserve.mode === 'class' ? mindbodySchedule(c ? c.date : null) : GYM.store); },
   'rv-send': async () => {
     const r = Reserve; if (r.sending) return; readReserve();
     const ok1 = validateContact(r.form, r);
     if (!/\d{7,}/.test(r.form.phone.replace(/\D/g, ''))) r.errors.phone = 'Enter a mobile number so the desk can reach you.';
-    if (!ok1 || r.errors.phone) { renderReserve(); const bad = $('[data-ov="book"] .has-error input'); if (bad) bad.focus(); return; }
+    const kidsC = reserveClass(); if (r.mode === 'class' && kidsC && kidsC.type.deskOnly && !(r.form.child || '').trim()) r.errors.child = 'Tell us your child’s name and age.';
+    if (!ok1 || r.errors.phone || r.errors.child) { renderReserve(); const bad = $('[data-ov="book"] .has-error input'); if (bad) bad.focus(); return; }
     const c = reserveClass(); const item = itemInfo(r.item); const f = r.form;
     if (r.mode === 'class' && !c) { r.step = 'pick'; renderReserve(); return; }
     const details = { pay: 'At the gym' };
     if (r.mode === 'class') {
       details.class = c.type.name; details.when = classLine(c); if (c.coach) details.coach = c.coach.name;
-      details.pass = (PASS_CHOICES.find((p) => p[0] === r.pass) || PASS_CHOICES[3])[1];
+      if (c.type.deskOnly) details.child = (f.child || '').trim(); else details.pass = (PASS_CHOICES.find((p) => p[0] === r.pass) || PASS_CHOICES[3])[1];
     } else {
       details.item = item.name; details.price = item.price;
       const fc = r.firstClass ? findClass(r.firstClass) : null; if (fc) details.first_class = `${classWith(fc)}, ${classLine(fc)}`;
@@ -2686,7 +2689,7 @@ Object.assign(actions, {
     r.sending = true; r.failed = false; renderReserve();
     const ok = await sendRequest(r.mode === 'class' ? 'booking' : 'purchase', { name: `${f.first.trim()} ${f.last.trim()}`, email: f.email, phone: f.phone, message: f.note }, details, trap);
     r.sending = false;
-    if (ok) { r.done = { cls: c, item, first: f.first.trim(), rental: r.rental }; r.step = 'done'; r.form = { first: '', last: '', email: '', phone: '', note: '' }; r.firstClass = ''; r.rental = false; }
+    if (ok) { r.done = { cls: c, item, first: f.first.trim(), rental: r.rental }; r.step = 'done'; r.form = { first: '', last: '', email: '', phone: '', note: '', child: '' }; r.firstClass = ''; r.rental = false; }
     else r.failed = true;
     renderReserve();
   },
@@ -2964,7 +2967,7 @@ function renderQuiz() {
     return;
   }
   const r = quizResult();
-  const nextLine = r.nx ? `<div class="recap"><span class="tag tag--${r.nx.type.tag}">${TAG_LABEL[r.nx.type.tag]}</span><b>Next one that fits</b><span>${esc(classLine(r.nx))} with ${esc(r.nx.coach.name)}</span></div>` : '';
+  const nextLine = r.nx ? `<div class="recap"><span class="tag tag--${r.nx.type.tag}">${TAG_LABEL[r.nx.type.tag]}</span><b>Next one that fits</b><span>${esc(classLine(r.nx))}${r.nx.coach ? ' with ' + esc(r.nx.coach.name) : ''}</span></div>` : '';
   host.innerHTML = `<header class="sheet__head sheet__head--done on-red"><div><p class="label">Your corner</p><h2 class="h-l" id="quiz-title">${esc(r.prog.name)}</h2></div>
       <button class="iconbtn" type="button" data-action="overlay-close" aria-label="Close">${icon('x')}</button></header>
     <div class="sheet__body">
@@ -3254,7 +3257,7 @@ function localAnswer(q) {
   if (has('shower', 'locker', 'changing')) return { text: 'Yes. There are showers and lockers, so a 7 AM or noon class fits around work. Bring your own towel, or buy a clean one at the gym.', actions: [] };
   if (has('clean', 'sanit', 'covid', 'mask', 'hygien', ' sick', 'germ')) return { text: 'Staff sanitize the equipment and the floor after classes and private sessions, and Gym Access members wipe down what they use with the supplies provided. Masks are not required, though private clients can ask their trainer to wear one. If you are feeling unwell, please stay home.', actions: [route('Read the FAQ', 'visit', 'faq')] };
   if (has('gym access', 'general access', 'open gym', 'on my own', 'by myself', 'weights', 'weight room', 'lifting')) return { text: 'Gym Access is $100 a month. Train on your own schedule during open hours, with full use of the boxing area and the lifting area. Access can be limited while trainers run one-on-one sessions.', actions: [{ label: 'Get Gym Access', action: 'buy', data: { item: 'access' } }, route('See all pricing', 'pricing')] };
-  if (has(' kid', 'child', ' teen', ' son ', 'daughter', 'youth', 'haven', 'year old')) return { text: 'Kids Boxing runs Monday, Wednesday and Friday at 5 PM, and the front desk handles enrollment. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons from 4 to 7 PM.', actions: [{ label: 'Ask about Kids Boxing', action: 'inquire', data: { kind: 'kids' } }, route('About Hammer’s Haven', 'haven')] };
+  if (has(' kid', 'child', ' teen', ' son ', 'daughter', 'youth', 'haven', 'year old')) return { text: 'Kids Boxing runs Monday, Wednesday and Friday at 5 PM. Reserve a spot here and pay at the front desk. Johnny also coaches children one-on-one. Hammer’s Haven, the not-for-profit at the same address, runs youth boxing and mentoring on weekday afternoons from 4 to 7 PM.', actions: [{ label: 'Reserve a Kids Boxing spot', action: 'book', data: { type: 'kids' } }, route('About Hammer’s Haven', 'haven')] };
   if (has('park')) return { text: `I do not have parking details listed. The front desk can tell you: ${GYM.phone}. By train, Sedgwick on the Brown Line is about a 4-minute walk.`, actions: [route('Getting here', 'visit')] };
   if (has('where', 'address', 'location', 'direction', 'get there', 'transit', 'cta', ' bus', 'brown line', 'red line', 'station', 'subway', ' near')) return { text: `${GYM.street}, at the corner of North and Mohawk in Old Town. Sedgwick (Brown and Purple lines) is about a 4-minute walk. North/Clybourn on the Red Line is about 8 minutes, and the #72 North Ave bus runs past.`, actions: [{ label: 'Open directions', href: GYM.maps }, route('Map and hours', 'visit')] };
   if (has('hour', 'open', 'close', 'closing')) {
@@ -3267,11 +3270,11 @@ function localAnswer(q) {
   if (has('cancel', 'refund', 'expire', 'expiration', 'policy', 'reschedule')) return { text: 'Private boxing and personal training sessions need 24 hours’ notice to cancel or move. Session packages expire after 90 days, and the 10-class pack expires 12 weeks after purchase.', actions: [route('Pricing details', 'pricing')] };
   if (has('beginner', 'never', 'first time', 'new to', 'experience', 'out of shape', 'intimidat', 'nervous', 'scared')) return { text: 'You will fit right in. Every group class welcomes all skill levels and is beginner friendly. Coaches teach proper form first, and sparring is never required. New clients can take 3 classes for $30.', actions: nx ? [book(nx, 'Book a first class'), { label: 'Find your corner', action: 'quiz-open' }] : [] };
   if (has('price', 'cost', 'how much', 'membership', 'unlimited', 'pack', 'drop in', 'drop-in', 'intro', 'trial', 'deal', 'discount', 'special', 'promo', 'free', '$', ' pay', ' rates ', ' fee')) return { text: 'New clients start with 3 classes for $30. After that a single class is $30, a 10-class pack is $250 and unlimited group boxing is $150 a month. Boxing plus general gym access is $200 a month. First-time clients also get 25% off packages.', actions: [route('See all pricing', 'pricing'), { label: 'Claim the intro offer', action: 'book', data: { pass: 'intro' } }] };
-  if (has('lunch', 'noon', 'midday')) { const m = nextClass(WEEKVIEW, (c) => c.type.id === 'lunch'); return { text: `Lunch-Time Boxing runs Monday to Friday at 12 PM for one hour.${m ? ` The next one is ${classLine(m)} with ${stop(m.coach.name)}` : ''}`, actions: m ? [book(m)] : [] }; }
+  if (has('lunch', 'noon', 'midday')) { const m = nextClass(WEEKVIEW, (c) => c.type.id === 'lunch'); return { text: `Hammer Hip House Boxing runs Monday to Friday at 12 PM for one hour.${m ? ` The next one is ${classLine(m)} with ${stop(m.coach.name)}` : ''}`, actions: m ? [book(m)] : [] }; }
   if (has('morning', 'early', '7 am', 'before work')) { const m = nextClass(WEEKVIEW, (c) => c.t < 600 && c.day < 5); return { text: `Morning boxing is at 7 AM, Monday to Friday.${m ? ` The next one is ${classLine(m)} with ${stop(m.coach.name)}` : ''}`, actions: m ? [book(m)] : [] }; }
   if (has('evening', 'after work', 'tonight', 'night', '5 pm', '6 pm')) { const m = nextClass(WEEKVIEW, (c) => c.t >= 1020); return { text: `Evening boxing runs at 5 PM and 6 PM, Monday to Friday, plus Muay Thai at 6 PM on Tuesday and Thursday.${m ? ` The next evening class is ${classLine(m)}.` : ''}`, actions: m ? [book(m)] : [] }; }
   if (has('saturday', 'weekend', 'sunday')) { const m = nextClass(WEEKVIEW, (c) => c.day === 5); const sat = GYM.hours[5]; return { text: `Saturday has boxing at 10 AM and sparring at 11 AM. The gym is open ${clock(sat[0]).short} to ${clock(sat[1]).short} on Saturday and closed Sunday.`, actions: m ? [book(m, 'Book Saturday 10 AM')] : [] }; }
-  if (has('class', 'schedule', 'next', 'today', 'tomorrow', 'when', 'time', 'book', 'sign up', 'reserve', 'join')) return { text: nx ? `The next class is ${nx.type.name} with ${nx.coach.name}, ${classLine(nx)}. Boxing runs Monday to Friday at 7 AM, 12 PM, 5 PM and 6 PM, and Saturday at 10 AM.` : 'Boxing runs Monday to Friday at 7 AM, 12 PM, 5 PM and 6 PM, and Saturday at 10 AM.', actions: nx ? [book(nx), route('Full schedule', 'schedule')] : [route('Full schedule', 'schedule')] };
+  if (has('class', 'schedule', 'next', 'today', 'tomorrow', 'when', 'time', 'book', 'sign up', 'reserve', 'join')) return { text: nx ? `The next class is ${nx.type.name}${nx.coach ? ' with ' + nx.coach.name : ''}, ${classLine(nx)}. Boxing runs Monday to Friday at 7 AM, 12 PM, 5 PM and 6 PM, and Saturday at 10 AM.` : 'Boxing runs Monday to Friday at 7 AM, 12 PM, 5 PM and 6 PM, and Saturday at 10 AM.', actions: nx ? [book(nx), route('Full schedule', 'schedule')] : [route('Full schedule', 'schedule')] };
   if (has('phone', 'call', 'email', 'contact', 'talk to', 'human', 'person')) return { text: `Call ${GYM.phone} or email ${GYM.email}. For training questions, write to ${GYM.emailTraining}.`, actions: [route('Contact and hours', 'visit')] };
   if (has('timer', 'round', 'shadow')) return { text: 'There is a free round timer with a combo caller on this site. Three minutes on, one off, with the bell.', actions: [route('Open the timer', 'train')] };
   if (has('shop', 'merch', 'hoodie', 'shirt', 'buy', 'cap')) return { text: 'The shop has Hammer tees, hoodies, caps and sweats, plus hand wraps, gloves and mouthpieces.', actions: [route('Visit the shop', 'shop')] };
@@ -3369,7 +3372,7 @@ function renderProgramsPage() {
           <ul class="ticks">${p.points.map((t) => `<li>${star()}<span>${esc(t)}</span></li>`).join('')}</ul>
           <dl class="summary">
             <div><dt>Price</dt><dd>${esc(p.price)}</dd></div>
-            ${nx ? `<div><dt>Next one</dt><dd>${esc(classLine(nx))} with ${esc(nx.coach.name)}</dd></div>` : ''}
+            ${nx ? `<div><dt>Next one</dt><dd>${esc(classLine(nx))}${nx.coach ? ' with ' + esc(nx.coach.name) : ''}</dd></div>` : ''}
           </dl>
           <div class="btn-row">${programCta(p)}<a class="link" href="#pricing" data-route="pricing">See pricing</a></div>
         </div>

@@ -130,7 +130,7 @@ function renderQuiz() {
     return;
   }
   const r = quizResult();
-  const nextLine = r.nx ? `<div class="recap"><span class="tag tag--${r.nx.type.tag}">${TAG_LABEL[r.nx.type.tag]}</span><b>Next one that fits</b><span>${esc(classLine(r.nx))} with ${esc(r.nx.coach.name)}</span></div>` : '';
+  const nextLine = r.nx ? `<div class="recap"><span class="tag tag--${r.nx.type.tag}">${TAG_LABEL[r.nx.type.tag]}</span><b>Next one that fits</b><span>${esc(classLine(r.nx))}${r.nx.coach ? ' with ' + esc(r.nx.coach.name) : ''}</span></div>` : '';
   host.innerHTML = `<header class="sheet__head sheet__head--done on-red"><div><p class="label">Your corner</p><h2 class="h-l" id="quiz-title">${esc(r.prog.name)}</h2></div>
       <button class="iconbtn" type="button" data-action="overlay-close" aria-label="Close">${icon('x')}</button></header>
     <div class="sheet__body">

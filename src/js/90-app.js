@@ -41,7 +41,7 @@ function renderProgramsPage() {
           <ul class="ticks">${p.points.map((t) => `<li>${star()}<span>${esc(t)}</span></li>`).join('')}</ul>
           <dl class="summary">
             <div><dt>Price</dt><dd>${esc(p.price)}</dd></div>
-            ${nx ? `<div><dt>Next one</dt><dd>${esc(classLine(nx))} with ${esc(nx.coach.name)}</dd></div>` : ''}
+            ${nx ? `<div><dt>Next one</dt><dd>${esc(classLine(nx))}${nx.coach ? ' with ' + esc(nx.coach.name) : ''}</dd></div>` : ''}
           </dl>
           <div class="btn-row">${programCta(p)}<a class="link" href="#pricing" data-route="pricing">See pricing</a></div>
         </div>

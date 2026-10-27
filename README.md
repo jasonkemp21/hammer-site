@@ -25,8 +25,8 @@ How the site works:
 These come from the old site, which disagreed with itself in places. Fix them in `src/js/00-data.js`, then rebuild (see section 5).
 
 1. **Hours.** The site uses Mon–Fri 6 AM–8 PM, Sat 8 AM–2 PM, Sunday closed. The old site also listed Mon–Thu 6 AM–9 PM with Fri 6 AM–7 PM, and a third set in its search data.
-2. **Kids Boxing.** The coach, age range and price aren't set yet. Until they are, it shows "Ask the desk".
-3. **Weekly schedule.** It's typed into `WEEK` in `00-data.js`. It doesn't read Mindbody, so update it when classes or coaches change. Mindbody calls the noon class "Hammer Hip House Boxing", while the site says "Lunch-Time Boxing".
+2. **Kids Boxing.** The coach, age range and price aren't set yet. It is not on Mindbody, so it is reserved on the site (parent's details plus the child's name and age) and paid at the desk.
+3. **Weekly schedule.** It's typed into `WEEK` in `00-data.js`. It doesn't read Mindbody, so update it when classes or coaches change. Mindbody calls the noon class "Hammer Hip House Boxing", while the site says "Hammer Hip House Boxing".
 4. **Pass names and prices.** Mindbody's store uses names like "Boxing Classes (Without G.A)" and "Group Class + G.A". The site uses the old website's names, such as Group Boxing Unlimited and Boxing + General Access. Check the prices match, and check that the 3-for-$30 intro offer can be bought on Mindbody.
 5. **Offers.** Check that 3 classes for $30, 25% off packages for first-timers, and 10% off personal training packages are all still running.
 6. **The Squarespace store.** The old site sells sessions and memberships through Squarespace's "Purchase Now" pages and store. Those stop working when the domain moves. Before switching, have the gym check Squarespace for active subscriptions or open orders, and move anything it sells online into Mindbody.
@@ -101,4 +101,4 @@ node build.mjs
 
 This rebuilds `docs/` and keeps the Supabase settings already in `docs/config.js`. Commit and push, and Pages updates in about a minute. Node 18 or newer, no installs needed.
 
-To test the build: `node test/live-site.mjs` runs 57 checks against stand-ins for Supabase and Mindbody. It needs Playwright.
+To test the build: `node test/live-site.mjs` runs 59 checks against stand-ins for Supabase and Mindbody. It needs Playwright.

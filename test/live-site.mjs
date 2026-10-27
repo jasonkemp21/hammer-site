@@ -83,6 +83,7 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   const body = (await page.evaluate(() => document.body.innerText)).toLowerCase();
   check(!/concept|pitch notes|demo|simulat|add to cart|your cart/.test(body), `${tag}: no concept, demo or cart wording on the page`, (body.match(/.{20}(concept|pitch notes|demo|simulat|add to cart|your cart).{20}/) || [''])[0]);
   check(await page.title() === 'Hammer Boxing & Fitness | Boxing Gym in Old Town, Chicago', `${tag}: home title`);
+  check(body.indexOf('hammer hip house boxing') >= 0 && body.indexOf('lunch-time boxing') < 0, `${tag}: the noon class is Hammer Hip House Boxing everywhere`);
   const ld = await page.evaluate(() => { const s = document.querySelector('script[type="application/ld+json"]'); try { return JSON.parse(s.textContent); } catch (e) { return null; } });
   check(ld && ld['@type'] === 'ExerciseGym' && ld.openingHoursSpecification.length === 6, `${tag}: structured data with 6 open days`);
   check(await page.locator('meta[name=robots]').count() === 0, `${tag}: page is indexable (no noindex)`);
@@ -124,7 +125,7 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
     await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(300);
     await page.click('.head__book'); await page.waitForTimeout(300);
     check(await page.locator('input[name="rv-class"]').count() > 0, 'header Book with no class picked shows the class picker');
-    await page.locator('input[name="rv-class"]').nth(1).check(); await page.click('[data-action="rv-how"]'); await page.waitForTimeout(200);
+    await page.locator('label.opt', { hasText: '6:00 PM' }).first().locator('input').check(); await page.click('[data-action="rv-how"]'); await page.waitForTimeout(200);
     await page.click('[data-action="rv-form"]'); await page.waitForTimeout(200);
     await page.click('[data-action="rv-send"]'); await page.waitForTimeout(200);
     check(await page.locator('[data-ov="book"] .has-error').count() >= 3, 'empty reservation form shows errors instead of sending');
@@ -178,17 +179,19 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
     await page.evaluate(() => { document.querySelector('[data-contact] [data-hp]').value = 'spam'; });
     await page.click('[data-contact] button[type=submit]'); await page.waitForTimeout(400);
     check(db.inserts.length === before, 'the spam trap blocks bot submissions');
-    // Kids Boxing request from the schedule
+    // Kids Boxing: reserved on the site, no Mindbody choice
     await page.evaluate(() => { location.hash = 'schedule'; }); await page.waitForTimeout(300);
     await page.locator('.week .slot--kids').first().click(); await page.waitForTimeout(300);
-    check(/Kids Boxing/i.test(await page.locator('#inq-title').innerText()), 'Kids Boxing opens its own request form');
-    await page.fill('#inq-fn', 'Dana'); await page.fill('#inq-ln', 'Ruiz'); await page.fill('#inq-em', 'dana@example.com'); await page.fill('#inq-note', 'Son is 10, never boxed.');
-    await page.click('[data-action="inq-send"]'); await page.waitForTimeout(500);
+    check(await page.locator('[data-ov="book"]:not([hidden]) .way').count() === 0 && /child/i.test(await page.locator('#book-title').textContent()) && await page.locator('#rv-child').count() === 1, 'Kids Boxing goes straight to a parent reservation form');
+    await page.fill('#rv-fn', 'Dana'); await page.fill('#rv-ln', 'Ruiz'); await page.fill('#rv-em', 'dana@example.com'); await page.fill('#rv-ph', '7735550111');
+    await page.click('[data-action="rv-send"]'); await page.waitForTimeout(200);
+    check(await page.locator('#rv-child-err').count() === 1, 'a kids reservation needs the child’s name and age');
+    await page.fill('#rv-child', 'Sam, 10'); await page.fill('#rv-note', 'Never boxed.');
+    await page.click('[data-action="rv-send"]'); await page.waitForTimeout(500);
     const k = db.inserts[db.inserts.length - 1];
-    check(k && k.kind === 'kids' && k.name === 'Dana Ruiz' && k.message === 'Son is 10, never boxed.', 'Kids Boxing request is saved', JSON.stringify(k));
-    check(/Request received/i.test(await page.locator('#inq-title').innerText()), 'Kids request confirms after the save');
+    check(k && k.kind === 'booking' && k.details.class === 'Kids Boxing' && k.details.child === 'Sam, 10' && k.name === 'Dana Ruiz' && !k.details.pass, 'Kids Boxing reservation is saved with the child', JSON.stringify(k));
     await page.screenshot({ path: `${out}/kids-sent.png` });
-    await page.click('[data-ov="inquire"] [data-action="overlay-close"]');
+    await page.click('[data-ov="book"] [data-action="overlay-close"]');
     // private boxing request with coach and pack
     await page.evaluate(() => { location.hash = 'pricing'; }); await page.waitForTimeout(300);
     await page.locator('[data-view="pricing"] [data-action="inquire"][data-kind="boxing"]').first().click(); await page.waitForTimeout(300);
@@ -230,9 +233,9 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   check(cards === db.rows.filter((r) => r.status === 'new').length && cards >= 5, `admin lists the new requests (${cards})`);
   check(await page.locator('.req', { hasText: 'Maya Ortiz' }).locator('.pill--booking').count() === 1 && /When:/.test(await page.locator('.req', { hasText: 'Maya Ortiz' }).innerText()), 'class reservation shows as a reservation with its time');
   await page.selectOption('[data-kind-filter]', 'booking'); await page.waitForTimeout(150);
-  check(await page.locator('.req').count() === 1, 'type filter narrows to class reservations');
+  check(await page.locator('.req').count() === 2, 'type filter narrows to class reservations');
   await page.selectOption('[data-kind-filter]', 'all'); await page.waitForTimeout(150);
-  check(await page.locator('.req', { hasText: 'Dana Ruiz' }).locator('.pill--kids').count() === 1, 'Kids Boxing requests are labelled');
+  check(/Kids Boxing/.test(await page.locator('.req', { hasText: 'Dana Ruiz' }).innerText()) && /Child: Sam, 10/.test(await page.locator('.req', { hasText: 'Dana Ruiz' }).innerText()), 'Kids Boxing reservation shows the child in admin');
   await page.screenshot({ path: `${out}/admin-list.png`, fullPage: true });
   await page.locator('.req', { hasText: 'Pat Lee' }).locator('[data-toggle]').click(); await page.waitForTimeout(400);
   check(db.patches.length === 1 && db.patches[0].patch.status === 'handled', 'Mark handled saves to the database');
