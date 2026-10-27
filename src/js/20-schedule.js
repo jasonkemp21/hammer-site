@@ -4,10 +4,12 @@ let WEEKVIEW = buildWeek();
 
 function coachCell(c) {
   if (!c.coach) { const [a, b] = c.type.noCoach || ['Hammer coaches', '']; return `<div class="bout__coach"><span>${esc(a)}<small>${esc(b)}</small></span></div>`; }
-  return `<div class="bout__coach"><img src="${c.coach.ava}" alt="" width="46" height="46" loading="lazy"><span>${esc(c.coach.name)}<small>${esc(c.coach.role.split(' · ')[0])}</small></span></div>`;
+  const pic = c.coach.ava ? `<img src="${c.coach.ava}" alt="" width="46" height="46" loading="lazy">` : `<span class="bout__initials" aria-hidden="true">${esc((c.coach.first || c.coach.name).slice(0, 1))}</span>`;
+  return `<div class="bout__coach">${pic}<span>${esc(c.coach.name)}<small>${c.sub ? 'Covering for ' + esc(c.sub) : esc((c.coach.role || 'Coach').split(' · ')[0])}</small></span></div>`;
 }
 function boutCta(c) {
   if (c.past === true) return '<span class="bout__done">Final bell</span>';
+  if (c.cancelled) return '<span class="bout__done">Cancelled</span>';
   if (c.past === 'live') return '<span class="bout__done">Under way</span>';
   if (state.bookings[c.key]) return `<span class="bout__in">${icon('check')} You're on the card</span>`;
   if (!c.type.bookable) return `<button class="btn btn--ghost btn--sm" type="button" data-action="inquire" data-kind="${c.type.ask}">${c.type.askLabel}</button>`;
@@ -23,7 +25,7 @@ function boutRow(c, nextKey) {
     <div class="bout__time">${ck.h}:${pad2(ck.m)}<small>${ck.ap}</small></div>
     <div class="bout__what">
       <h3 class="bout__name">${esc(c.type.name)}</h3>
-      <div class="bout__meta"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>${c.type.bookable ? `<span>${c.type.mins} min</span>` : ''}${c.type.level ? `<span>${esc(c.type.level)}</span>` : ''}</div>
+      <div class="bout__meta"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>${c.type.bookable ? `<span>${c.mins || c.type.mins} min</span>` : ''}${c.type.level ? `<span>${esc(c.type.level)}</span>` : ''}</div>
     </div>
     ${coachCell(c)}
     <div class="bout__cta">${boutCta(c)}</div>
@@ -97,14 +99,19 @@ function renderStatus() {
 }
 
 /* ----- schedule page ----- */
+function scheduleNote() {
+  const el = $('[data-sched-note]'); if (!el) return;
+  if (SCHED) { const when = new Intl.DateTimeFormat('en-US', { timeZone: GYM.tz, weekday: 'long', hour: 'numeric', minute: '2-digit' }).format(SCHED.fetched); el.innerHTML = `Times and coaches come from the gym's Mindbody calendar and refresh every morning. Last checked ${esc(when)}. Kids Boxing and Saturday sparring are reserved through the front desk. <a class="link" href="${GYM.mindbody}" target="_blank" rel="noopener">Open the Mindbody schedule</a>`; }
+  else el.textContent = 'Times and coaches as posted by the gym. Kids Boxing and Saturday sparring are reserved through the front desk.';
+}
 function renderSchedule() {
-  const host = $('[data-schedule]'); if (!host) return;
+  const host = $('[data-schedule]'); if (!host) return; scheduleNote();
   const f = state.sched; const nx = nextClass(WEEKVIEW);
   const typeChips = [['all', 'All classes'], ['boxing', 'Boxing'], ['lunch', 'Hip House'], ['muaythai', 'Muay Thai'], ['kids', 'Kids'], ['sparring', 'Sparring']]
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.type === id}" data-action="sched-type" data-id="${id}">${id === 'all' ? '' : `<span class="tag tag--${id}"></span>`}${label}</button>`).join('');
   const coachChips = [['all', 'Any coach']].concat(COACH_ORDER.map((id) => [id, COACHES[id].first]))
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.coach === id}" data-action="sched-coach" data-id="${id}">${label}</button>`).join('');
-  const slots = Array.from(new Set(WEEK.map((c) => c.t))).sort((a, b) => a - b);
+  const slots = Array.from(new Set(WEEKVIEW.days.flatMap((d) => d.classes.map((c) => c.t)))).sort((a, b) => a - b);
   const total = WEEKVIEW.days.flatMap((d) => d.classes).filter(matchesFilter).length;
 
   const head = `<div class="week__corner"></div>` + WEEKVIEW.days.map((d) => `<div class="week__day ${d.n === 0 ? 'is-today' : ''} ${d.hours ? '' : 'is-closed'}"><b>${DAYS3[d.day]}</b><span>${fmtMonthDay.format(d.date)}${d.n === 0 ? ' · today' : ''}</span></div>`).join('');
@@ -135,8 +142,8 @@ function slotCard(c, nextKey) {
   const inner = `<span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>
     <b class="slot__name">${esc(c.type.name)}</b>
     <span class="slot__coach">${c.coach ? esc(c.coach.name) : esc((c.type.noCoach || ['Hammer coaches'])[0])}</span>
-    <span class="slot__cta">${c.past === true ? 'Final bell' : c.past === 'live' ? 'Under way' : booked ? icon('check') + ' Booked' : c.type.bookable ? 'Book ' + icon('go', 'i--go') : c.type.askLabel}</span>`;
-  if (c.past) return `<div class="${cls}">${inner}</div>`;
+    <span class="slot__cta">${c.cancelled ? 'Cancelled' : c.past === true ? 'Final bell' : c.past === 'live' ? 'Under way' : booked ? icon('check') + ' Booked' : c.type.bookable ? 'Book ' + icon('go', 'i--go') : c.type.askLabel}</span>`;
+  if (c.past || c.cancelled) return `<div class="${cls} ${c.cancelled ? 'is-past' : ''}">${inner}</div>`;
   if (!c.type.bookable) return `<button class="${cls}" type="button" data-action="inquire" data-kind="${c.type.ask}">${inner}</button>`;
   return `<button class="${cls}" type="button" data-action="book" data-class="${c.key}">${inner}</button>`;
 }

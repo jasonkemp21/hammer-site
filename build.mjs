@@ -2,6 +2,7 @@
 //   docs/index.html        the whole site, one page
 //   docs/admin/index.html  the staff page for website requests
 //   docs/config.js         Supabase settings, edited after deploy without a rebuild
+//   docs/schedule.json     the class schedule read from Mindbody by the daily GitHub job (kept across builds)
 //   plus 404 forwarding, robots.txt, sitemap.xml, icons and only the images the site uses
 import fs from 'node:fs';
 import path from 'node:path';
@@ -47,6 +48,9 @@ const keptConfig = fs.existsSync(liveConfig) && /supabaseUrl:\s*'https?:/.test(f
 // keep the custom domain GitHub writes to docs/CNAME when it is set in Settings > Pages
 const cnameFile = path.join(dist, 'CNAME');
 const keptCname = fs.existsSync(cnameFile) ? fs.readFileSync(cnameFile, 'utf8') : null;
+// keep the schedule the daily job fetched from Mindbody
+const schedFile = path.join(dist, 'schedule.json');
+const keptSched = fs.existsSync(schedFile) ? fs.readFileSync(schedFile, 'utf8') : null;
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(path.join(dist, 'img'), { recursive: true });
 fs.mkdirSync(path.join(dist, 'admin'), { recursive: true });
@@ -55,6 +59,7 @@ fs.copyFileSync(path.join(root, 'src/admin.html'), path.join(dist, 'admin/index.
 for (const f of fs.readdirSync(path.join(root, 'static'))) fs.copyFileSync(path.join(root, 'static', f), path.join(dist, f));
 if (keptConfig) fs.writeFileSync(liveConfig, keptConfig);
 if (keptCname) fs.writeFileSync(cnameFile, keptCname);
+if (keptSched) fs.writeFileSync(schedFile, keptSched);
 for (const f of ['favicon.png', 'apple-touch-icon.png']) fs.copyFileSync(path.join(root, 'assets', f), path.join(dist, f));
 fs.copyFileSync(path.join(root, 'assets/og.jpg'), path.join(dist, 'img/og.jpg'));
 // only images the page actually names

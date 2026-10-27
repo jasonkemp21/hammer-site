@@ -230,5 +230,15 @@ function start() {
   addStructuredData();
   go(saved.route || routeFromHash(), null, true);
   setInterval(tick, 1000);
+  loadLiveSchedule();
+}
+/* docs/schedule.json is rewritten every morning by the GitHub job; one request a day per visitor is cached by the browser */
+function loadLiveSchedule() {
+  const day = ymd(dateAfter(gymNow(), 0));
+  fetch('schedule.json?d=' + day, { cache: 'default' }).then((r) => (r.ok ? r.json() : null)).then((data) => {
+    if (!data) return;
+    setLiveSchedule(data); if (!SCHED) return;
+    WEEKVIEW = buildWeek(); renderAllSchedule(); renderCoachesPage(); emit('week');
+  }).catch(() => { /* the typed schedule stays */ });
 }
 start();

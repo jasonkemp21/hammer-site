@@ -108,6 +108,16 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   await pop.close();
   check(await page.locator('[data-ov="book"]:not([hidden])').count() === 0, `${tag}: sheet closes after handing off to Mindbody`);
   await page.screenshot({ path: `${out}/${tag}-schedule.png` });
+  if (tag === 'desk') {
+    const note = await page.locator('[data-sched-note]').innerText();
+    check(/refresh every morning/.test(note) && /Last checked/.test(note), 'schedule note says it comes from Mindbody and when it was checked');
+    const mon5 = await page.locator('.week .week__cell.is-today .slot', { hasText: 'Boxing' }).first().innerText();
+    check(/Teijon/.test(mon5), 'live schedule shows the substitute coach from Mindbody for Monday 5 PM', mon5.replace(/\s+/g, ' '));
+    const covering = (await page.locator('.weeklist .bout').evaluateAll((els) => els.map((e) => e.textContent))).find((t) => /Teijon/.test(t) && /5:00/.test(t)) || '';
+    check(/Covering for JJ Higgins/.test(covering), 'the day list marks a substitute as covering for the regular coach', covering.replace(/\s+/g, ' '));
+    check(await page.locator('.week .slot--kids').count() === 3 && await page.locator('.week .slot--sparring').count() === 1, 'Kids Boxing and sparring (not on Mindbody) still appear alongside the live classes');
+  }
+
   // Buy on pricing -> sheet; Mindbody way opens the store
   await page.evaluate(() => { location.hash = 'pricing'; }); await page.waitForTimeout(300);
   await page.locator('.pass button[data-action="buy"][data-item="unlimited"]').click(); await page.waitForTimeout(300);
@@ -202,6 +212,16 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
     check(pv && pv.kind === 'boxing' && pv.details.coach === 'Johnny Higgins Jr.' && pv.details.best_times === 'Evenings' && /sessions|Single/.test(pv.details.sessions), 'private boxing request carries coach, times and pack', JSON.stringify(pv && pv.details));
     await page.click('[data-ov="inquire"] [data-action="overlay-close"]');
   }
+  await ctx.close();
+}
+
+// ================= no schedule.json: the typed pattern is used =================
+{
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 } }); await setup(ctx);
+  await ctx.route(ORIGIN + '/schedule.json*', (r) => r.fulfill({ status: 404, body: '' }));
+  const page = await ctx.newPage(); page.on('pageerror', (e) => errors.push('fallback pageerror: ' + e.message));
+  await page.goto(ORIGIN + '/#schedule'); await page.waitForTimeout(700);
+  check(/as posted by the gym/.test(await page.locator('[data-sched-note]').innerText()) && await page.locator('.week .slot').count() > 20, 'without schedule.json the typed weekly schedule is shown');
   await ctx.close();
 }
 

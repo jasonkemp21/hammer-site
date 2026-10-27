@@ -1,0 +1,423 @@
+{
+ "source": "mindbody",
+ "studio": 744102,
+ "fetched": "2026-10-27T20:47:15.942Z",
+ "from": "2026-10-26",
+ "to": "2026-11-07",
+ "classes": [
+  {
+   "date": "2026-10-26",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-26",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-26",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": "JJ Higgins",
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-26",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "Sam Smith",
+   "regular": "JJ Higgins",
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-27",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-27",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-27",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-27",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-27",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Muay Thai",
+   "coach": "Micheal Lopez",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-28",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-28",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-28",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-28",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-29",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-29",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-29",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-29",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-29",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Muay Thai",
+   "coach": "Micheal Lopez",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-30",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-30",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-30",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-30",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-10-31",
+   "start": "10:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-02",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-02",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-02",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-02",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-03",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-03",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-03",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-03",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-03",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Muay Thai",
+   "coach": "Micheal Lopez",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-04",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-04",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-04",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-04",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-05",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-05",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-05",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-05",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-05",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Muay Thai",
+   "coach": "Micheal Lopez",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-06",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-06",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-06",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-06",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false
+  },
+  {
+   "date": "2026-11-07",
+   "start": "10:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false
+  }
+ ]
+}

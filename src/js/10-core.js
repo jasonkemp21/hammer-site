@@ -37,6 +37,38 @@ function duration(totalSecs) {
   return { d, h, m, s: sec, hms: `${pad2(d * 24 + h)}:${pad2(m)}:${pad2(sec)}`, words: d ? `${d}d ${h}h` : h ? `${h}h ${pad2(m)}m` : m ? `${m} min` : `${sec} sec` };
 }
 
+/* ---------- the live schedule: docs/schedule.json, read from Mindbody every morning ----------
+   Dates it covers come from Mindbody. Dates it does not cover fall back to the typed weekly pattern (WEEK).
+   Classes the gym runs outside Mindbody (Kids Boxing, sparring) are site-only and always come from the pattern. */
+let SCHED = null; // { fetched: Date, byDate: { 'YYYY-MM-DD': [entry] } }
+const CLASS_NAME_TO_TYPE = { 'boxing': 'boxing', 'hammer hip house boxing': 'lunch', 'lunch-time boxing': 'lunch', 'muay thai': 'muaythai', 'kids boxing': 'kids', 'sparring': 'sparring' };
+function liveType(name, mins) {
+  const id = CLASS_NAME_TO_TYPE[name.toLowerCase().trim()];
+  if (id && CLASS_TYPES[id]) return CLASS_TYPES[id];
+  const slug = 'mb-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return CLASS_TYPES[slug] || (CLASS_TYPES[slug] = { id: slug, name: name.trim(), tag: 'boxing', mins: mins || 60, level: 'All levels', bookable: true, blurb: '' });
+}
+/* "teijon Price" -> the site's Tee; a coach the site does not know is shown by name */
+function liveCoach(name) {
+  if (!name) return null;
+  const n = name.toLowerCase().replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const hit = Object.values(COACHES).find((c) => { const mine = (c.name + ' ' + c.first + ' ' + (c.last || '')).toLowerCase(); const parts = n.split(' '); return parts.length && parts.every((p) => mine.indexOf(p) >= 0) || (c.last && n.endsWith(c.last.toLowerCase()) && mine.indexOf(parts[0].slice(0, 3)) >= 0); });
+  if (hit) return hit;
+  const parts = name.trim().split(/\s+/);
+  return { id: 'mb-' + n.replace(/ /g, '-'), name: name.trim(), first: parts[0], last: parts.slice(1).join(' '), role: 'Coach', ava: null, guest: true };
+}
+function setLiveSchedule(data) {
+  if (!data || !Array.isArray(data.classes) || !data.classes.length) { SCHED = null; return; }
+  const byDate = {};
+  data.classes.forEach((c) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(c.date || ''); const hm = /^(\d{2}):(\d{2})$/.exec(c.start || ''); if (!m || !hm) return;
+    const type = liveType(c.name || 'Class', c.mins);
+    (byDate[c.date] = byDate[c.date] || []).push({ t: +hm[1] * 60 + +hm[2], type, mins: c.mins || type.mins, coach: liveCoach(c.coach), sub: c.regular || null, cancelled: !!c.cancelled });
+  });
+  SCHED = { fetched: new Date(data.fetched || 0), from: data.from, to: data.to, byDate };
+}
+const dateKey = (d) => `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+
 /* ---------- the week ahead: 7 days of class occurrences starting today ---------- */
 function buildWeek() {
   const now = gymNow();
@@ -44,17 +76,21 @@ function buildWeek() {
   for (let n = 0; n < 7; n++) {
     const date = dateAfter(now, n);
     const day = (now.day + n) % 7;
-    const classes = WEEK.filter((c) => c.day === day).map((c) => {
-      const type = CLASS_TYPES[c.type];
+    const live = SCHED && SCHED.byDate[dateKey(date)];
+    const pattern = WEEK.filter((c) => c.day === day).filter((c) => !live || CLASS_TYPES[c.type].siteOnly)
+      .map((c) => ({ t: c.t, type: CLASS_TYPES[c.type], mins: CLASS_TYPES[c.type].mins, coach: c.coach ? COACHES[c.coach] : null, sub: null, cancelled: false }));
+    const used = {};
+    const classes = (live || []).concat(pattern).map((c) => {
       const startsIn = (n * 1440 + c.t - now.mins) * 60 - now.secs;
-      return { key: `${ymd(date)}-${c.t}-${c.type}`, n, day, date, t: c.t, type, coach: c.coach ? COACHES[c.coach] : null, startsIn, past: startsIn <= -type.mins * 60 ? true : startsIn <= 0 ? 'live' : false };
+      let key = `${ymd(date)}-${c.t}-${c.type.id}`; if (used[key]) key += '-' + (used[key] + 1); used[key.split('-').slice(0, 3).join('-')] = (used[key.split('-').slice(0, 3).join('-')] || 0) + 1;
+      return { key, n, day, date, t: c.t, type: c.type, mins: c.mins, coach: c.coach, sub: c.sub, cancelled: c.cancelled, live: !!live, startsIn, past: startsIn <= -c.mins * 60 ? true : startsIn <= 0 ? 'live' : false };
     }).sort((a, b) => a.t - b.t || (a.type.id === 'boxing' ? -1 : 1));
-    days.push({ n, day, date, classes, hours: GYM.hours[day] });
+    days.push({ n, day, date, classes, hours: GYM.hours[day], live: !!live });
   }
   return { now, days };
 }
 function allUpcoming(week) { return week.days.flatMap((d) => d.classes).filter((c) => c.startsIn > 0); }
-function nextClass(week, filter) { return allUpcoming(week).filter((c) => c.type.bookable && (!filter || filter(c)))[0] || null; }
+function nextClass(week, filter) { return allUpcoming(week).filter((c) => c.type.bookable && !c.cancelled && (!filter || filter(c)))[0] || null; }
 function findClass(key) { const w = buildWeek(); return w.days.flatMap((d) => d.classes).find((c) => c.key === key) || null; }
 
 /* open or closed right now, and when that changes */

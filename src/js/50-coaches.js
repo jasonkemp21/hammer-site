@@ -10,7 +10,7 @@ function joinDays(days) {
 /* a coach's week, grouped: [{ type, days:[..], t }] */
 function coachWeek(id) {
   const groups = {};
-  WEEK.filter((c) => c.coach === id).forEach((c) => { const k = c.type + '|' + c.t; (groups[k] = groups[k] || { type: CLASS_TYPES[c.type], t: c.t, days: [] }).days.push(c.day); });
+  WEEKVIEW.days.flatMap((d) => d.classes).filter((c) => c.coach && c.coach.id === id && !c.cancelled).forEach((c) => { const k = c.type.id + '|' + c.t; const g = groups[k] = groups[k] || { type: c.type, t: c.t, days: [] }; if (g.days.indexOf(c.day) < 0) g.days.push(c.day); });
   return Object.values(groups).sort((a, b) => a.t - b.t);
 }
 function coachWeekLine(id) { return coachWeek(id).map((g) => `${g.type.name}: ${joinDays(g.days)} ${clock(g.t).short}`); }

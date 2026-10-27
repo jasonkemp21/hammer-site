@@ -132,20 +132,21 @@ const CLASS_TYPES = {
   },
   // the gym lists only "Sparring: Saturday 11AM"; mins is used for the timeline and never shown
   sparring: {
-    id: 'sparring', name: 'Sparring', tag: 'sparring', mins: 60, level: 'By choice', bookable: false,
+    id: 'sparring', name: 'Sparring', tag: 'sparring', mins: 60, level: 'By choice', bookable: false, siteOnly: true,
     blurb: 'Full-contact sparring. Available to all, never forced on anyone.',
     ask: 'compete', askLabel: 'Ask a coach', noCoach: ['In the ring', 'Available to all, never required'],
   },
   // Mon, Wed, Fri 5 PM. Not on Mindbody: reserved on the site and paid at the desk. Coach, ages and price still to come from the gym
   kids: {
-    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true,
+    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true, siteOnly: true,
     blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM. Reserved through the front desk.',
     noCoach: ['Hammer coaches', 'Reserve a spot, pay at the desk'],
   },
 };
 
-/* The weekly card. day: 0 = Monday. t: minutes from midnight. Coaches as listed on Mindbody, week of Oct 12, 2026.
-   Kids Boxing (Mon, Wed, Fri 5 PM) added at the gym's request. */
+/* The weekly pattern. day: 0 = Monday. t: minutes from midnight.
+   The live site reads Mindbody every morning (docs/schedule.json) and uses this only for days Mindbody has not published yet.
+   Kids Boxing and sparring are not on Mindbody, so they always come from here. */
 const WEEK = [
   { day: 0, t: 420, type: 'boxing', coach: 'tee' }, { day: 0, t: 720, type: 'lunch', coach: 'johnny' }, { day: 0, t: 1020, type: 'boxing', coach: 'jj' }, { day: 0, t: 1080, type: 'boxing', coach: 'jj' }, { day: 0, t: 1020, type: 'kids', coach: null },
   { day: 1, t: 420, type: 'boxing', coach: 'tee' }, { day: 1, t: 720, type: 'lunch', coach: 'johnny' }, { day: 1, t: 1020, type: 'boxing', coach: 'jj' }, { day: 1, t: 1080, type: 'boxing', coach: 'jj' }, { day: 1, t: 1080, type: 'muaythai', coach: 'lopez' },

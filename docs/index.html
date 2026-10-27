@@ -826,6 +826,7 @@ button.slot:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--fg); 
 .shop__foot { margin-top: 28px; }
 .policy { display: grid; gap: 14px; }
 .policy h2 { margin-top: 14px; }
+.bout__initials { width: 46px; height: 46px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--surface-2); color: var(--fg); font: 900 1.25rem/1 var(--display); }
 
 /* ================= SHEETS AND DRAWERS ================= */
 html.is-locked { overflow: hidden; }
@@ -1390,7 +1391,7 @@ html.is-locked { overflow: hidden; }
   <div class="band band--paper">
     <div class="wrap">
       <div data-schedule></div>
-      <p class="micro muted sched__note">Times and coaches mirror the gym's Mindbody calendar for the week of October 12, 2026. Saturday sparring is from the gym's classes page. On the live site this page reads Mindbody directly, so a change there shows up here. <a class="link" href="https://clients.mindbodyonline.com/classic/ws?studioid=744102&amp;stype=-7&amp;sView=week" target="_blank" rel="noopener">Open the gym's current Mindbody schedule</a></p>
+      <p class="micro muted sched__note" data-sched-note>Times and coaches as posted by the gym.</p>
     </div>
   </div>
   <div class="band band--ink band--tight">
@@ -1864,20 +1865,21 @@ const CLASS_TYPES = {
   },
   // the gym lists only "Sparring: Saturday 11AM"; mins is used for the timeline and never shown
   sparring: {
-    id: 'sparring', name: 'Sparring', tag: 'sparring', mins: 60, level: 'By choice', bookable: false,
+    id: 'sparring', name: 'Sparring', tag: 'sparring', mins: 60, level: 'By choice', bookable: false, siteOnly: true,
     blurb: 'Full-contact sparring. Available to all, never forced on anyone.',
     ask: 'compete', askLabel: 'Ask a coach', noCoach: ['In the ring', 'Available to all, never required'],
   },
   // Mon, Wed, Fri 5 PM. Not on Mindbody: reserved on the site and paid at the desk. Coach, ages and price still to come from the gym
   kids: {
-    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true,
+    id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true, siteOnly: true,
     blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM. Reserved through the front desk.',
     noCoach: ['Hammer coaches', 'Reserve a spot, pay at the desk'],
   },
 };
 
-/* The weekly card. day: 0 = Monday. t: minutes from midnight. Coaches as listed on Mindbody, week of Oct 12, 2026.
-   Kids Boxing (Mon, Wed, Fri 5 PM) added at the gym's request. */
+/* The weekly pattern. day: 0 = Monday. t: minutes from midnight.
+   The live site reads Mindbody every morning (docs/schedule.json) and uses this only for days Mindbody has not published yet.
+   Kids Boxing and sparring are not on Mindbody, so they always come from here. */
 const WEEK = [
   { day: 0, t: 420, type: 'boxing', coach: 'tee' }, { day: 0, t: 720, type: 'lunch', coach: 'johnny' }, { day: 0, t: 1020, type: 'boxing', coach: 'jj' }, { day: 0, t: 1080, type: 'boxing', coach: 'jj' }, { day: 0, t: 1020, type: 'kids', coach: null },
   { day: 1, t: 420, type: 'boxing', coach: 'tee' }, { day: 1, t: 720, type: 'lunch', coach: 'johnny' }, { day: 1, t: 1020, type: 'boxing', coach: 'jj' }, { day: 1, t: 1080, type: 'boxing', coach: 'jj' }, { day: 1, t: 1080, type: 'muaythai', coach: 'lopez' },
@@ -2066,6 +2068,38 @@ function duration(totalSecs) {
   return { d, h, m, s: sec, hms: `${pad2(d * 24 + h)}:${pad2(m)}:${pad2(sec)}`, words: d ? `${d}d ${h}h` : h ? `${h}h ${pad2(m)}m` : m ? `${m} min` : `${sec} sec` };
 }
 
+/* ---------- the live schedule: docs/schedule.json, read from Mindbody every morning ----------
+   Dates it covers come from Mindbody. Dates it does not cover fall back to the typed weekly pattern (WEEK).
+   Classes the gym runs outside Mindbody (Kids Boxing, sparring) are site-only and always come from the pattern. */
+let SCHED = null; // { fetched: Date, byDate: { 'YYYY-MM-DD': [entry] } }
+const CLASS_NAME_TO_TYPE = { 'boxing': 'boxing', 'hammer hip house boxing': 'lunch', 'lunch-time boxing': 'lunch', 'muay thai': 'muaythai', 'kids boxing': 'kids', 'sparring': 'sparring' };
+function liveType(name, mins) {
+  const id = CLASS_NAME_TO_TYPE[name.toLowerCase().trim()];
+  if (id && CLASS_TYPES[id]) return CLASS_TYPES[id];
+  const slug = 'mb-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return CLASS_TYPES[slug] || (CLASS_TYPES[slug] = { id: slug, name: name.trim(), tag: 'boxing', mins: mins || 60, level: 'All levels', bookable: true, blurb: '' });
+}
+/* "teijon Price" -> the site's Tee; a coach the site does not know is shown by name */
+function liveCoach(name) {
+  if (!name) return null;
+  const n = name.toLowerCase().replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const hit = Object.values(COACHES).find((c) => { const mine = (c.name + ' ' + c.first + ' ' + (c.last || '')).toLowerCase(); const parts = n.split(' '); return parts.length && parts.every((p) => mine.indexOf(p) >= 0) || (c.last && n.endsWith(c.last.toLowerCase()) && mine.indexOf(parts[0].slice(0, 3)) >= 0); });
+  if (hit) return hit;
+  const parts = name.trim().split(/\s+/);
+  return { id: 'mb-' + n.replace(/ /g, '-'), name: name.trim(), first: parts[0], last: parts.slice(1).join(' '), role: 'Coach', ava: null, guest: true };
+}
+function setLiveSchedule(data) {
+  if (!data || !Array.isArray(data.classes) || !data.classes.length) { SCHED = null; return; }
+  const byDate = {};
+  data.classes.forEach((c) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(c.date || ''); const hm = /^(\d{2}):(\d{2})$/.exec(c.start || ''); if (!m || !hm) return;
+    const type = liveType(c.name || 'Class', c.mins);
+    (byDate[c.date] = byDate[c.date] || []).push({ t: +hm[1] * 60 + +hm[2], type, mins: c.mins || type.mins, coach: liveCoach(c.coach), sub: c.regular || null, cancelled: !!c.cancelled });
+  });
+  SCHED = { fetched: new Date(data.fetched || 0), from: data.from, to: data.to, byDate };
+}
+const dateKey = (d) => `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+
 /* ---------- the week ahead: 7 days of class occurrences starting today ---------- */
 function buildWeek() {
   const now = gymNow();
@@ -2073,17 +2107,21 @@ function buildWeek() {
   for (let n = 0; n < 7; n++) {
     const date = dateAfter(now, n);
     const day = (now.day + n) % 7;
-    const classes = WEEK.filter((c) => c.day === day).map((c) => {
-      const type = CLASS_TYPES[c.type];
+    const live = SCHED && SCHED.byDate[dateKey(date)];
+    const pattern = WEEK.filter((c) => c.day === day).filter((c) => !live || CLASS_TYPES[c.type].siteOnly)
+      .map((c) => ({ t: c.t, type: CLASS_TYPES[c.type], mins: CLASS_TYPES[c.type].mins, coach: c.coach ? COACHES[c.coach] : null, sub: null, cancelled: false }));
+    const used = {};
+    const classes = (live || []).concat(pattern).map((c) => {
       const startsIn = (n * 1440 + c.t - now.mins) * 60 - now.secs;
-      return { key: `${ymd(date)}-${c.t}-${c.type}`, n, day, date, t: c.t, type, coach: c.coach ? COACHES[c.coach] : null, startsIn, past: startsIn <= -type.mins * 60 ? true : startsIn <= 0 ? 'live' : false };
+      let key = `${ymd(date)}-${c.t}-${c.type.id}`; if (used[key]) key += '-' + (used[key] + 1); used[key.split('-').slice(0, 3).join('-')] = (used[key.split('-').slice(0, 3).join('-')] || 0) + 1;
+      return { key, n, day, date, t: c.t, type: c.type, mins: c.mins, coach: c.coach, sub: c.sub, cancelled: c.cancelled, live: !!live, startsIn, past: startsIn <= -c.mins * 60 ? true : startsIn <= 0 ? 'live' : false };
     }).sort((a, b) => a.t - b.t || (a.type.id === 'boxing' ? -1 : 1));
-    days.push({ n, day, date, classes, hours: GYM.hours[day] });
+    days.push({ n, day, date, classes, hours: GYM.hours[day], live: !!live });
   }
   return { now, days };
 }
 function allUpcoming(week) { return week.days.flatMap((d) => d.classes).filter((c) => c.startsIn > 0); }
-function nextClass(week, filter) { return allUpcoming(week).filter((c) => c.type.bookable && (!filter || filter(c)))[0] || null; }
+function nextClass(week, filter) { return allUpcoming(week).filter((c) => c.type.bookable && !c.cancelled && (!filter || filter(c)))[0] || null; }
 function findClass(key) { const w = buildWeek(); return w.days.flatMap((d) => d.classes).find((c) => c.key === key) || null; }
 
 /* open or closed right now, and when that changes */
@@ -2229,10 +2267,12 @@ let WEEKVIEW = buildWeek();
 
 function coachCell(c) {
   if (!c.coach) { const [a, b] = c.type.noCoach || ['Hammer coaches', '']; return `<div class="bout__coach"><span>${esc(a)}<small>${esc(b)}</small></span></div>`; }
-  return `<div class="bout__coach"><img src="${c.coach.ava}" alt="" width="46" height="46" loading="lazy"><span>${esc(c.coach.name)}<small>${esc(c.coach.role.split(' · ')[0])}</small></span></div>`;
+  const pic = c.coach.ava ? `<img src="${c.coach.ava}" alt="" width="46" height="46" loading="lazy">` : `<span class="bout__initials" aria-hidden="true">${esc((c.coach.first || c.coach.name).slice(0, 1))}</span>`;
+  return `<div class="bout__coach">${pic}<span>${esc(c.coach.name)}<small>${c.sub ? 'Covering for ' + esc(c.sub) : esc((c.coach.role || 'Coach').split(' · ')[0])}</small></span></div>`;
 }
 function boutCta(c) {
   if (c.past === true) return '<span class="bout__done">Final bell</span>';
+  if (c.cancelled) return '<span class="bout__done">Cancelled</span>';
   if (c.past === 'live') return '<span class="bout__done">Under way</span>';
   if (state.bookings[c.key]) return `<span class="bout__in">${icon('check')} You're on the card</span>`;
   if (!c.type.bookable) return `<button class="btn btn--ghost btn--sm" type="button" data-action="inquire" data-kind="${c.type.ask}">${c.type.askLabel}</button>`;
@@ -2248,7 +2288,7 @@ function boutRow(c, nextKey) {
     <div class="bout__time">${ck.h}:${pad2(ck.m)}<small>${ck.ap}</small></div>
     <div class="bout__what">
       <h3 class="bout__name">${esc(c.type.name)}</h3>
-      <div class="bout__meta"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>${c.type.bookable ? `<span>${c.type.mins} min</span>` : ''}${c.type.level ? `<span>${esc(c.type.level)}</span>` : ''}</div>
+      <div class="bout__meta"><span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>${c.type.bookable ? `<span>${c.mins || c.type.mins} min</span>` : ''}${c.type.level ? `<span>${esc(c.type.level)}</span>` : ''}</div>
     </div>
     ${coachCell(c)}
     <div class="bout__cta">${boutCta(c)}</div>
@@ -2322,14 +2362,19 @@ function renderStatus() {
 }
 
 /* ----- schedule page ----- */
+function scheduleNote() {
+  const el = $('[data-sched-note]'); if (!el) return;
+  if (SCHED) { const when = new Intl.DateTimeFormat('en-US', { timeZone: GYM.tz, weekday: 'long', hour: 'numeric', minute: '2-digit' }).format(SCHED.fetched); el.innerHTML = `Times and coaches come from the gym's Mindbody calendar and refresh every morning. Last checked ${esc(when)}. Kids Boxing and Saturday sparring are reserved through the front desk. <a class="link" href="${GYM.mindbody}" target="_blank" rel="noopener">Open the Mindbody schedule</a>`; }
+  else el.textContent = 'Times and coaches as posted by the gym. Kids Boxing and Saturday sparring are reserved through the front desk.';
+}
 function renderSchedule() {
-  const host = $('[data-schedule]'); if (!host) return;
+  const host = $('[data-schedule]'); if (!host) return; scheduleNote();
   const f = state.sched; const nx = nextClass(WEEKVIEW);
   const typeChips = [['all', 'All classes'], ['boxing', 'Boxing'], ['lunch', 'Hip House'], ['muaythai', 'Muay Thai'], ['kids', 'Kids'], ['sparring', 'Sparring']]
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.type === id}" data-action="sched-type" data-id="${id}">${id === 'all' ? '' : `<span class="tag tag--${id}"></span>`}${label}</button>`).join('');
   const coachChips = [['all', 'Any coach']].concat(COACH_ORDER.map((id) => [id, COACHES[id].first]))
     .map(([id, label]) => `<button class="chip" type="button" aria-pressed="${f.coach === id}" data-action="sched-coach" data-id="${id}">${label}</button>`).join('');
-  const slots = Array.from(new Set(WEEK.map((c) => c.t))).sort((a, b) => a - b);
+  const slots = Array.from(new Set(WEEKVIEW.days.flatMap((d) => d.classes.map((c) => c.t)))).sort((a, b) => a - b);
   const total = WEEKVIEW.days.flatMap((d) => d.classes).filter(matchesFilter).length;
 
   const head = `<div class="week__corner"></div>` + WEEKVIEW.days.map((d) => `<div class="week__day ${d.n === 0 ? 'is-today' : ''} ${d.hours ? '' : 'is-closed'}"><b>${DAYS3[d.day]}</b><span>${fmtMonthDay.format(d.date)}${d.n === 0 ? ' · today' : ''}</span></div>`).join('');
@@ -2360,8 +2405,8 @@ function slotCard(c, nextKey) {
   const inner = `<span class="tag tag--${c.type.tag}">${TAG_LABEL[c.type.tag]}</span>
     <b class="slot__name">${esc(c.type.name)}</b>
     <span class="slot__coach">${c.coach ? esc(c.coach.name) : esc((c.type.noCoach || ['Hammer coaches'])[0])}</span>
-    <span class="slot__cta">${c.past === true ? 'Final bell' : c.past === 'live' ? 'Under way' : booked ? icon('check') + ' Booked' : c.type.bookable ? 'Book ' + icon('go', 'i--go') : c.type.askLabel}</span>`;
-  if (c.past) return `<div class="${cls}">${inner}</div>`;
+    <span class="slot__cta">${c.cancelled ? 'Cancelled' : c.past === true ? 'Final bell' : c.past === 'live' ? 'Under way' : booked ? icon('check') + ' Booked' : c.type.bookable ? 'Book ' + icon('go', 'i--go') : c.type.askLabel}</span>`;
+  if (c.past || c.cancelled) return `<div class="${cls} ${c.cancelled ? 'is-past' : ''}">${inner}</div>`;
   if (!c.type.bookable) return `<button class="${cls}" type="button" data-action="inquire" data-kind="${c.type.ask}">${inner}</button>`;
   return `<button class="${cls}" type="button" data-action="book" data-class="${c.key}">${inner}</button>`;
 }
@@ -2847,7 +2892,7 @@ function joinDays(days) {
 /* a coach's week, grouped: [{ type, days:[..], t }] */
 function coachWeek(id) {
   const groups = {};
-  WEEK.filter((c) => c.coach === id).forEach((c) => { const k = c.type + '|' + c.t; (groups[k] = groups[k] || { type: CLASS_TYPES[c.type], t: c.t, days: [] }).days.push(c.day); });
+  WEEKVIEW.days.flatMap((d) => d.classes).filter((c) => c.coach && c.coach.id === id && !c.cancelled).forEach((c) => { const k = c.type.id + '|' + c.t; const g = groups[k] = groups[k] || { type: c.type, t: c.t, days: [] }; if (g.days.indexOf(c.day) < 0) g.days.push(c.day); });
   return Object.values(groups).sort((a, b) => a.t - b.t);
 }
 function coachWeekLine(id) { return coachWeek(id).map((g) => `${g.type.name}: ${joinDays(g.days)} ${clock(g.t).short}`); }
@@ -3561,6 +3606,16 @@ function start() {
   addStructuredData();
   go(saved.route || routeFromHash(), null, true);
   setInterval(tick, 1000);
+  loadLiveSchedule();
+}
+/* docs/schedule.json is rewritten every morning by the GitHub job; one request a day per visitor is cached by the browser */
+function loadLiveSchedule() {
+  const day = ymd(dateAfter(gymNow(), 0));
+  fetch('schedule.json?d=' + day, { cache: 'default' }).then((r) => (r.ok ? r.json() : null)).then((data) => {
+    if (!data) return;
+    setLiveSchedule(data); if (!SCHED) return;
+    WEEKVIEW = buildWeek(); renderAllSchedule(); renderCoachesPage(); emit('week');
+  }).catch(() => { /* the typed schedule stays */ });
 }
 start();
 })();

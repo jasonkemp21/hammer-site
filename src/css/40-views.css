@@ -242,3 +242,4 @@ button.slot:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--fg); 
 .shop__foot { margin-top: 28px; }
 .policy { display: grid; gap: 14px; }
 .policy h2 { margin-top: 14px; }
+.bout__initials { width: 46px; height: 46px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--surface-2); color: var(--fg); font: 900 1.25rem/1 var(--display); }

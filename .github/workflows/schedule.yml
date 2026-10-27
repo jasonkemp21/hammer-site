@@ -1,0 +1,35 @@
+name: Refresh class schedule from Mindbody
+
+on:
+  schedule:
+    - cron: '15 10 * * *'   # every day at 5:15 AM Chicago (4:15 AM in summer)
+  workflow_dispatch:         # or press "Run workflow" on the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: schedule
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: npm install --no-save playwright@1.49.1 && npx playwright install --with-deps chromium
+      - name: Read the Mindbody schedule
+        run: node scripts/fetch-schedule.mjs docs/schedule.json
+      - name: Commit if it changed
+        run: |
+          git config user.name "schedule-bot"
+          git config user.email "schedule-bot@users.noreply.github.com"
+          if git diff --quiet -- docs/schedule.json; then echo "No change"; exit 0; fi
+          git add docs/schedule.json
+          git commit -m "Schedule from Mindbody, $(date -u +%Y-%m-%d)"
+          git push

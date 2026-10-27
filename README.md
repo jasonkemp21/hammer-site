@@ -17,6 +17,14 @@ How the site works:
 - **A pay-at-the-gym reservation is not a Mindbody booking.** Nothing is entered into Mindbody until staff do it. The desk should check `/admin/` before each class and, if a class can fill up, add the person in Mindbody or call them.
 - **Forms** (contact, private sessions, Kids Boxing, competing) save to Supabase. Staff read them at `/admin/`. If Supabase is down or not set up, the form tells the visitor to call or email instead. It never claims a message was sent when it wasn't.
 - **The shop** is a catalog. Everything in it is sold at the front desk.
+- **The schedule is live.** A job on GitHub reads the gym's public Mindbody schedule every morning and saves it to `docs/schedule.json`. The site builds its schedule, next-class card, coach pages and booking picker from that file. Substitute coaches show as "Covering for …". Kids Boxing and sparring (not on Mindbody) come from the typed pattern in `00-data.js`.
+
+## The live schedule
+
+- **When it runs:** every day at 5:15 AM Chicago time, and whenever you press **Actions → Refresh class schedule from Mindbody → Run workflow**. A change in Mindbody shows on the site after the next run.
+- **What it reads:** the gym's public Mindbody class page for the current and next calendar week (today through 7 to 13 days ahead), the same page a client sees. No login, no API key. It only reads; nothing is written to Mindbody.
+- **If it fails:** the job shows a red X on the Actions tab, nothing is committed, and the site keeps the last good schedule. Days beyond what was fetched fall back to the typed pattern. The schedule page says when the schedule was last checked. Mindbody sits behind Cloudflare and may one day refuse automated readers; if the job starts failing every day, the sturdier route is Mindbody's official API, which needs an approved developer account and the owner's activation.
+- **Pages redeploys** on each schedule commit, so the live site updates within a couple of minutes of the job.
 
 ---
 
@@ -26,7 +34,7 @@ These come from the old site, which disagreed with itself in places. Fix them in
 
 1. **Hours.** The site uses Mon–Fri 6 AM–8 PM, Sat 8 AM–2 PM, Sunday closed. The old site also listed Mon–Thu 6 AM–9 PM with Fri 6 AM–7 PM, and a third set in its search data.
 2. **Kids Boxing.** The coach, age range and price aren't set yet. It is not on Mindbody, so it is reserved on the site (parent's details plus the child's name and age) and paid at the desk.
-3. **Weekly schedule.** It's typed into `WEEK` in `00-data.js`. It doesn't read Mindbody, so update it when classes or coaches change. Mindbody calls the noon class "Hammer Hip House Boxing", while the site says "Hammer Hip House Boxing".
+3. **Weekly schedule.** Times and coaches come from the gym's Mindbody calendar automatically (see "The live schedule" below). Kids Boxing and Saturday sparring aren't on Mindbody, so they're typed into `WEEK` in `00-data.js`; update those there.
 4. **Pass names and prices.** Mindbody's store uses names like "Boxing Classes (Without G.A)" and "Group Class + G.A". The site uses the old website's names, such as Group Boxing Unlimited and Boxing + General Access. Check the prices match, and check that the 3-for-$30 intro offer can be bought on Mindbody.
 5. **Offers.** Check that 3 classes for $30, 25% off packages for first-timers, and 10% off personal training packages are all still running.
 6. **The Squarespace store.** The old site sells sessions and memberships through Squarespace's "Purchase Now" pages and store. Those stop working when the domain moves. Before switching, have the gym check Squarespace for active subscriptions or open orders, and move anything it sells online into Mindbody.
