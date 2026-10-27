@@ -20,11 +20,26 @@ const html = await res.text();
 // The page embeds its data as React Server Component rows: self.__next_f.push([1,"<row id>:<json>\n..."])
 const chunks = [...html.matchAll(/self\.__next_f\.push\(\[1,"((?:[^"\\]|\\.)*)"\]\)/g)].map((m) => JSON.parse('"' + m[1] + '"'));
 const payload = chunks.join('');
-const rows = {};
-for (const line of payload.split('\n')) { const m = /^([0-9a-f]+):(.*)$/.exec(line); if (m) rows[m[1]] = m[2]; }
+// a row looks like `2d:{...}`; text rows (`2f:T7a8,<p>...`) carry no newline before the next row, so find rows anywhere
+function matchBrackets(from) {
+  let depth = 0, inStr = false;
+  for (let k = from; k < payload.length; k++) {
+    const ch = payload[k];
+    if (inStr) { if (ch === '\\') k++; else if (ch === '"') inStr = false; continue; }
+    if (ch === '"') inStr = true; else if (ch === '{' || ch === '[') depth++; else if (ch === '}' || ch === ']') { depth--; if (!depth) return payload.slice(from, k + 1); }
+  }
+  return null;
+}
+const rowCache = {};
 const deref = (v) => { // "$2d" points at row 2d
-  if (typeof v === 'string' && /^\$[0-9a-f]+$/.test(v)) { try { return JSON.parse(rows[v.slice(1)]); } catch (e) { return null; } }
-  return v;
+  if (typeof v !== 'string' || !/^\$[0-9a-f]+$/.test(v)) return v;
+  const id = v.slice(1);
+  if (!(id in rowCache)) {
+    rowCache[id] = null;
+    const re = new RegExp('(?:^|[^0-9a-f])' + id + ':(?=[{\\[])', 'g'); let m;
+    while ((m = re.exec(payload))) { const txt = matchBrackets(m.index + m[0].length); try { const obj = JSON.parse(txt); if (obj && typeof obj === 'object') { rowCache[id] = obj; break; } } catch (e) { /* not this one */ } }
+  }
+  return rowCache[id];
 };
 const i = payload.indexOf('"initialClasses":');
 if (i < 0) { console.error('schedule not updated: no class data in the widget page'); process.exit(1); }

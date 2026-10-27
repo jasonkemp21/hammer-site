@@ -15,7 +15,7 @@ function renderShop() {
   host.innerHTML = `<div class="shopbar"><div class="chips">${chips}</div>
       <p class="small muted">Buying your own gear? Wraps and Everlast gloves come to ${money(14.88 + 40)}. Or rent gloves and wraps at the gym for $5.</p></div>
     <div class="products">${cards}</div>
-    <p class="small muted shop__foot">Everything here is sold at the front desk, ${esc(GYM.street)}. Call <a class="link" href="${GYM.tel}">${GYM.phone}</a> to check a size or color before you come in.</p>`;
+    <p class="small muted shop__foot">Everything here is sold at the front desk, ${esc(GYM.street.replace(/\.$/, ''))}. Call <a class="link" href="${GYM.tel}">${GYM.phone}</a> to check a size or color before you come in.</p>`;
 }
 
 Object.assign(actions, {

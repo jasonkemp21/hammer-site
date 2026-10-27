@@ -1177,7 +1177,7 @@ html.is-locked { overflow: hidden; }
       </div>
       <div class="daytabs" data-daytabs="home" role="tablist" aria-label="Pick a day"></div>
       <div class="bouts" data-bouts="home"></div>
-      <p class="micro muted bouts__foot">Boxing classes are 55 minutes of instruction in a one-hour slot. Coach assignments mirror the gym's Mindbody calendar for the week of October 12, 2026.</p>
+      <p class="micro muted bouts__foot" data-sched-note-home>Boxing classes are 55 minutes of instruction in a one-hour slot. Times and coaches come from the gym's Mindbody calendar.</p>
     </div>
   </div>
 
@@ -2704,8 +2704,9 @@ function openReserve(mode, opts) {
     let c = opts.key ? findClass(opts.key) : null;
     if ((!c || c.startsIn <= 0) && opts.type) c = nextClass(WEEKVIEW, (x) => x.type.id === opts.type);
     if (c && c.startsIn <= 0) c = null;
-    r.key = c ? c.key : null; r.dayN = c ? c.n : 0; r.item = null;
-    r.step = c ? (c.type.deskOnly ? 'form' : 'how') : 'pick';
+    r.item = null;
+    if (c) { r.key = c.key; r.dayN = c.n; r.step = c.type.deskOnly ? 'form' : 'how'; }
+    else { const nx = nextClass(WEEKVIEW); r.key = nx ? nx.key : null; r.dayN = nx ? nx.n : 0; r.step = 'pick'; } // picker opens on the next class, already selected
   } else {
     r.item = opts.item; r.key = null; r.step = 'how';
     if (!itemInfo(r.item)) { openOut(GYM.store); return; }
@@ -3260,7 +3261,7 @@ function renderShop() {
   host.innerHTML = `<div class="shopbar"><div class="chips">${chips}</div>
       <p class="small muted">Buying your own gear? Wraps and Everlast gloves come to ${money(14.88 + 40)}. Or rent gloves and wraps at the gym for $5.</p></div>
     <div class="products">${cards}</div>
-    <p class="small muted shop__foot">Everything here is sold at the front desk, ${esc(GYM.street)}. Call <a class="link" href="${GYM.tel}">${GYM.phone}</a> to check a size or color before you come in.</p>`;
+    <p class="small muted shop__foot">Everything here is sold at the front desk, ${esc(GYM.street.replace(/\.$/, ''))}. Call <a class="link" href="${GYM.tel}">${GYM.phone}</a> to check a size or color before you come in.</p>`;
 }
 
 Object.assign(actions, {

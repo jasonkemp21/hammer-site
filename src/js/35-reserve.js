@@ -142,8 +142,9 @@ function openReserve(mode, opts) {
     let c = opts.key ? findClass(opts.key) : null;
     if ((!c || c.startsIn <= 0) && opts.type) c = nextClass(WEEKVIEW, (x) => x.type.id === opts.type);
     if (c && c.startsIn <= 0) c = null;
-    r.key = c ? c.key : null; r.dayN = c ? c.n : 0; r.item = null;
-    r.step = c ? (c.type.deskOnly ? 'form' : 'how') : 'pick';
+    r.item = null;
+    if (c) { r.key = c.key; r.dayN = c.n; r.step = c.type.deskOnly ? 'form' : 'how'; }
+    else { const nx = nextClass(WEEKVIEW); r.key = nx ? nx.key : null; r.dayN = nx ? nx.n : 0; r.step = 'pick'; } // picker opens on the next class, already selected
   } else {
     r.item = opts.item; r.key = null; r.step = 'how';
     if (!itemInfo(r.item)) { openOut(GYM.store); return; }
