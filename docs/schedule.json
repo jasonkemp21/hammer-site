@@ -1,47 +1,14 @@
 {
  "source": "mindbody-widget",
  "widget": "b667859216f",
- "fetched": "2026-10-27T21:25:43.832Z",
- "from": "2026-10-26",
- "to": "2026-11-02",
+ "fetched": "2026-10-28T16:39:10.240Z",
+ "from": "2026-10-27",
+ "to": "2026-11-03",
  "types": [
-  "Boxing",
-  "Hammer Hip House Boxing"
+  "Hammer Hip House Boxing",
+  "Boxing"
  ],
  "classes": [
-  {
-   "date": "2026-10-27",
-   "start": "17:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 12,
-   "bookable": true
-  },
-  {
-   "date": "2026-10-27",
-   "start": "18:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 15,
-   "bookable": true
-  },
-  {
-   "date": "2026-10-28",
-   "start": "07:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "teijon Price",
-   "regular": null,
-   "cancelled": false,
-   "spots": 13,
-   "bookable": true
-  },
   {
    "date": "2026-10-28",
    "start": "12:00",
@@ -51,7 +18,7 @@
    "regular": null,
    "cancelled": false,
    "spots": 10,
-   "bookable": true
+   "bookable": false
   },
   {
    "date": "2026-10-28",
@@ -209,6 +176,50 @@
   },
   {
    "date": "2026-11-02",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-03",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-03",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 10,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-03",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-03",
    "start": "18:00",
    "mins": 60,
    "name": "Boxing",
