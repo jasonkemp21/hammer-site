@@ -114,8 +114,26 @@ const COACHES = {
     ],
     privates: ['boxing'],
   },
+  sam: {
+    say: 'a boxing coach and Colorado Golden Gloves champion',
+    id: 'sam', name: 'Sam', first: 'Sam', last: '', role: 'Boxing coach',
+    img: 'img/coach-sam.webp', ava: 'img/ava-sam.webp',
+    fact: 'Colorado Golden Gloves champion. Former college softball player.',
+    tape: [
+      ['Corner', 'Boxing coach'],
+      ['Amateur', 'Colorado Golden Gloves champion'],
+      ['Style', 'Technique first, with a Mexican style flair'],
+      ['Background', 'College softball'],
+      ['Teaches', 'Boxing, private boxing'],
+    ],
+    bio: [
+      'Sam is an amateur boxer and Colorado Golden Gloves champion who coaches boxing with a focus on technique, with a Mexican style flair. Sessions pair technical work with conditioning, so clients improve as boxers while building strength and endurance.',
+      'Her athletic roots go back to college softball. Training as an athlete her whole life built the discipline and competitive drive she brings to every round in the ring. Whether you are lacing up gloves for the first time, sharpening your technique or getting ready for your first bout, Sam will coach you, push you and help you fall in love with boxing too.',
+    ],
+    privates: ['boxing'],
+  },
 };
-const COACH_ORDER = ['johnny', 'jj', 'lopez', 'tee'];
+const COACH_ORDER = ['johnny', 'jj', 'lopez', 'tee', 'sam'];
 
 const CLASS_TYPES = {
   boxing: {

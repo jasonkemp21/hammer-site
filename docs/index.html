@@ -468,7 +468,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .corner__head .sec-head { margin-bottom: clamp(20px, 3vw, 36px); }
 .wall { background: var(--red); position: relative; overflow: hidden; }
 .wall__ghost { position: absolute; left: 50%; top: 2%; transform: translateX(-50%); font: 900 min(27.5vw, 500px)/.8 var(--display); color: var(--red-deep); white-space: nowrap; pointer-events: none; user-select: none; letter-spacing: -.01em; }
-.wall__row { position: relative; width: min(100%, 1400px); margin-inline: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; padding-top: clamp(20px, 5vw, 80px); }
+.wall__row { position: relative; width: min(100%, 1400px); margin-inline: auto; display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); align-items: stretch; padding-top: clamp(20px, 5vw, 80px); }
 .fighter { display: grid; grid-template-rows: auto 1fr; text-align: left; color: var(--paper); position: relative; min-width: 0; }
 .fighter__img { width: 108%; max-width: none; margin-inline: -4%; height: auto; aspect-ratio: 820 / 951; object-fit: contain; object-position: bottom center; transform-origin: 50% 100%; transition: transform .32s cubic-bezier(.2, .7, .2, 1); position: relative; z-index: 1; }
 .fighter:hover .fighter__img, .fighter:focus-visible .fighter__img { transform: scale(1.045); }
@@ -1241,8 +1241,8 @@ html.is-locked { overflow: hidden; }
           <h2 class="h-xl">In your <em>corner</em></h2>
         </div>
         <div class="sec-head__aside">
-          <p class="small muted">A former pro, an active amateur, a kickboxing competitor and a college athlete. All four teach form first.</p>
-          <a class="link" href="#coaches" data-route="coaches">Meet all four</a>
+          <p class="small muted">A former pro, two amateur boxers and a kickboxing competitor. All five teach form first.</p>
+          <a class="link" href="#coaches" data-route="coaches">Meet all five</a>
         </div>
       </div>
     </div>
@@ -1481,7 +1481,7 @@ html.is-locked { overflow: hidden; }
     <div class="wrap">
       <p class="label">Coaches</p>
       <h1 class="h-xl">In your <em>corner</em></h1>
-      <p class="lede">A former pro, his son, a kickboxing competitor and a rising southpaw. Every one of them teaches form first.</p>
+      <p class="lede">A former pro, his son, a kickboxing competitor, a rising southpaw and a Colorado Golden Gloves champion. Every one of them teaches form first.</p>
     </div>
   </div>
   <div class="wall" data-wall="ghost"></div>
@@ -1850,8 +1850,26 @@ const COACHES = {
     ],
     privates: ['boxing'],
   },
+  sam: {
+    say: 'a boxing coach and Colorado Golden Gloves champion',
+    id: 'sam', name: 'Sam', first: 'Sam', last: '', role: 'Boxing coach',
+    img: 'img/coach-sam.webp', ava: 'img/ava-sam.webp',
+    fact: 'Colorado Golden Gloves champion. Former college softball player.',
+    tape: [
+      ['Corner', 'Boxing coach'],
+      ['Amateur', 'Colorado Golden Gloves champion'],
+      ['Style', 'Technique first, with a Mexican style flair'],
+      ['Background', 'College softball'],
+      ['Teaches', 'Boxing, private boxing'],
+    ],
+    bio: [
+      'Sam is an amateur boxer and Colorado Golden Gloves champion who coaches boxing with a focus on technique, with a Mexican style flair. Sessions pair technical work with conditioning, so clients improve as boxers while building strength and endurance.',
+      'Her athletic roots go back to college softball. Training as an athlete her whole life built the discipline and competitive drive she brings to every round in the ring. Whether you are lacing up gloves for the first time, sharpening your technique or getting ready for your first bout, Sam will coach you, push you and help you fall in love with boxing too.',
+    ],
+    privates: ['boxing'],
+  },
 };
-const COACH_ORDER = ['johnny', 'jj', 'lopez', 'tee'];
+const COACH_ORDER = ['johnny', 'jj', 'lopez', 'tee', 'sam'];
 
 const CLASS_TYPES = {
   boxing: {
@@ -2908,7 +2926,7 @@ function coachWeek(id) {
 function coachWeekLine(id) { return coachWeek(id).map((g) => `${g.type.name}: ${joinDays(g.days)} ${clock(g.t).short}`); }
 
 function wallMarkup(ghost) {
-  return `${ghost ? '<div class="wall__ghost" aria-hidden="true">HAMMER</div>' : ''}<div class="wall__row">${COACH_ORDER.map((id) => { const c = COACHES[id];
+  return `${ghost ? '<div class="wall__ghost" aria-hidden="true">HAMMER</div>' : ''}<div class="wall__row" style="--n:${COACH_ORDER.length}">${COACH_ORDER.map((id) => { const c = COACHES[id];
     return `<button class="fighter" type="button" data-action="coach-open" data-id="${id}" aria-label="${esc(c.name)}, ${esc(c.role)}. Open tale of the tape.">
         <img class="fighter__img" src="${c.img}" width="820" height="951" loading="lazy" alt="">
         <span class="fighter__plate"><span class="fighter__name">${esc(c.name)}</span><span class="fighter__role">${esc(c.role)}</span>
@@ -2930,7 +2948,7 @@ function coachCtas(c) {
 function renderCoachModal(id) {
   const c = COACHES[id]; const host = $('[data-coachcard]'); if (!c || !host) return;
   host.innerHTML = `<div class="tapecard">
-      <div class="tapecard__photo on-red"><img src="${c.img}" width="820" height="951" alt="${esc(c.name)}"><span class="tapecard__ghost" aria-hidden="true">${esc(c.last)}</span></div>
+      <div class="tapecard__photo on-red"><span class="tapecard__ghost" aria-hidden="true">${esc(c.last || c.first)}</span><img src="${c.img}" width="820" height="951" alt="${esc(c.name)}"></div>
       <div class="tapecard__body">
         <header class="sheet__head sheet__head--flat"><div><p class="label">Tale of the tape</p><h2 class="h-l" id="coach-title">${esc(c.name)}</h2></div>
           <button class="iconbtn" type="button" data-action="overlay-close" aria-label="Close">${icon('x')}</button></header>
@@ -2944,7 +2962,7 @@ function renderCoachesPage() {
   const host = $('[data-coaches]'); if (!host) return;
   host.innerHTML = COACH_ORDER.map((id, i) => { const c = COACHES[id];
     return `<article class="coach ${i % 2 ? 'coach--flip' : ''}" id="coach-${id}">
-        <div class="coach__photo on-red"><span class="coach__ghost" aria-hidden="true">${esc(c.last)}</span><img src="${c.img}" width="820" height="951" loading="lazy" alt="${esc(c.name)}, ${esc(c.role)}"></div>
+        <div class="coach__photo on-red"><span class="coach__ghost" aria-hidden="true">${esc(c.last || c.first)}</span><img src="${c.img}" width="820" height="951" loading="lazy" alt="${esc(c.name)}, ${esc(c.role)}"></div>
         <div class="coach__body">
           <p class="label">${esc(c.role)}</p>
           <h2 class="h-l">${esc(c.name)}</h2>
@@ -3287,7 +3305,7 @@ function localAnswer(q) {
   const book = (c, label) => ({ label: label || 'Book this class', action: 'book', data: { class: c.key } });
   const route = (label, r, scroll) => ({ label, route: r, scroll });
 
-  const coachId = has('johnny', 'owner') ? 'johnny' : has(' jj ') ? 'jj' : has('michael', 'lopez') ? 'lopez' : (has(' tee ', 'teijon') && !has('shirt')) ? 'tee' : null;
+  const coachId = has('johnny', 'owner') ? 'johnny' : has(' jj ') ? 'jj' : has('michael', 'lopez') ? 'lopez' : (has(' tee ', 'teijon') && !has('shirt')) ? 'tee' : has(' sam ') ? 'sam' : null;
   if (coachId && !has('price', 'cost', 'how much')) {
     const c = COACHES[coachId]; const wk = coachWeekLine(coachId);
     return { text: `${c.name} is ${c.say}. ${c.fact} ${wk.length ? 'This week: ' + wk.join('; ') + '.' : ''}`, actions: [{ label: 'Tale of the tape', action: 'coach-open', data: { id: coachId } }, { label: `Classes with ${c.first}`, action: 'coach-classes', data: { id: coachId } }] };
@@ -3304,7 +3322,7 @@ function localAnswer(q) {
       : 'Private boxing is one-on-one with active fighters: $125 for a single session, 5 for $500, 10 for $950, 20 for $1,800 or 40 for $3,400. First-time clients get 25% off packages. Give 24 hours’ notice to cancel, and use a package within 90 days.',
     actions: [{ label: 'Request a session', action: 'inquire', data: { kind: pt ? 'pt' : 'boxing' } }, route('See all pricing', 'pricing')] };
   }
-  if (has('coaches', 'trainers', 'instructors', 'who teaches', 'who coaches', 'staff', 'who are the')) return { text: 'Four coaches: ' + COACH_ORDER.map((id) => COACHES[id].name + ', ' + COACHES[id].say).join('; ') + '.', actions: [route('Meet the coaches', 'coaches')] };
+  if (has('coaches', 'trainers', 'instructors', 'who teaches', 'who coaches', 'staff', 'who are the')) return { text: ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'][COACH_ORDER.length] + ' coaches: ' + COACH_ORDER.map((id) => COACHES[id].name + ', ' + COACHES[id].say).join('; ') + '.', actions: [route('Meet the coaches', 'coaches')] };
   if (has('heavy bag', 'speed bag', 'what equipment', 'equipment do', 'facilit', 'amenit', 'what is inside', 'whats inside')) return { text: 'The gym has a full boxing ring, heavy bags, speed bags and a lifting area, plus showers and lockers.', actions: [route('See inside', 'visit')] };
   if (has('towel')) return { text: 'Bring your own towel. Sweat towels are not provided, but clean towels are for sale at the gym if you forget. There are showers and lockers.', actions: [route('Read the FAQ', 'visit', 'faq')] };
   if (has('water', 'fountain', 'bottle')) return { text: 'Bring a refillable bottle. The water fountains are no-touch bottle fillers.', actions: [] };

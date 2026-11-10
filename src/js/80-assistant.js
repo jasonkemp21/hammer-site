@@ -16,7 +16,7 @@ function localAnswer(q) {
   const book = (c, label) => ({ label: label || 'Book this class', action: 'book', data: { class: c.key } });
   const route = (label, r, scroll) => ({ label, route: r, scroll });
 
-  const coachId = has('johnny', 'owner') ? 'johnny' : has(' jj ') ? 'jj' : has('michael', 'lopez') ? 'lopez' : (has(' tee ', 'teijon') && !has('shirt')) ? 'tee' : null;
+  const coachId = has('johnny', 'owner') ? 'johnny' : has(' jj ') ? 'jj' : has('michael', 'lopez') ? 'lopez' : (has(' tee ', 'teijon') && !has('shirt')) ? 'tee' : has(' sam ') ? 'sam' : null;
   if (coachId && !has('price', 'cost', 'how much')) {
     const c = COACHES[coachId]; const wk = coachWeekLine(coachId);
     return { text: `${c.name} is ${c.say}. ${c.fact} ${wk.length ? 'This week: ' + wk.join('; ') + '.' : ''}`, actions: [{ label: 'Tale of the tape', action: 'coach-open', data: { id: coachId } }, { label: `Classes with ${c.first}`, action: 'coach-classes', data: { id: coachId } }] };
@@ -33,7 +33,7 @@ function localAnswer(q) {
       : 'Private boxing is one-on-one with active fighters: $125 for a single session, 5 for $500, 10 for $950, 20 for $1,800 or 40 for $3,400. First-time clients get 25% off packages. Give 24 hours’ notice to cancel, and use a package within 90 days.',
     actions: [{ label: 'Request a session', action: 'inquire', data: { kind: pt ? 'pt' : 'boxing' } }, route('See all pricing', 'pricing')] };
   }
-  if (has('coaches', 'trainers', 'instructors', 'who teaches', 'who coaches', 'staff', 'who are the')) return { text: 'Four coaches: ' + COACH_ORDER.map((id) => COACHES[id].name + ', ' + COACHES[id].say).join('; ') + '.', actions: [route('Meet the coaches', 'coaches')] };
+  if (has('coaches', 'trainers', 'instructors', 'who teaches', 'who coaches', 'staff', 'who are the')) return { text: ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'][COACH_ORDER.length] + ' coaches: ' + COACH_ORDER.map((id) => COACHES[id].name + ', ' + COACHES[id].say).join('; ') + '.', actions: [route('Meet the coaches', 'coaches')] };
   if (has('heavy bag', 'speed bag', 'what equipment', 'equipment do', 'facilit', 'amenit', 'what is inside', 'whats inside')) return { text: 'The gym has a full boxing ring, heavy bags, speed bags and a lifting area, plus showers and lockers.', actions: [route('See inside', 'visit')] };
   if (has('towel')) return { text: 'Bring your own towel. Sweat towels are not provided, but clean towels are for sale at the gym if you forget. There are showers and lockers.', actions: [route('Read the FAQ', 'visit', 'faq')] };
   if (has('water', 'fountain', 'bottle')) return { text: 'Bring a refillable bottle. The water fountains are no-touch bottle fillers.', actions: [] };

@@ -16,7 +16,7 @@ function coachWeek(id) {
 function coachWeekLine(id) { return coachWeek(id).map((g) => `${g.type.name}: ${joinDays(g.days)} ${clock(g.t).short}`); }
 
 function wallMarkup(ghost) {
-  return `${ghost ? '<div class="wall__ghost" aria-hidden="true">HAMMER</div>' : ''}<div class="wall__row">${COACH_ORDER.map((id) => { const c = COACHES[id];
+  return `${ghost ? '<div class="wall__ghost" aria-hidden="true">HAMMER</div>' : ''}<div class="wall__row" style="--n:${COACH_ORDER.length}">${COACH_ORDER.map((id) => { const c = COACHES[id];
     return `<button class="fighter" type="button" data-action="coach-open" data-id="${id}" aria-label="${esc(c.name)}, ${esc(c.role)}. Open tale of the tape.">
         <img class="fighter__img" src="${c.img}" width="820" height="951" loading="lazy" alt="">
         <span class="fighter__plate"><span class="fighter__name">${esc(c.name)}</span><span class="fighter__role">${esc(c.role)}</span>
@@ -38,7 +38,7 @@ function coachCtas(c) {
 function renderCoachModal(id) {
   const c = COACHES[id]; const host = $('[data-coachcard]'); if (!c || !host) return;
   host.innerHTML = `<div class="tapecard">
-      <div class="tapecard__photo on-red"><img src="${c.img}" width="820" height="951" alt="${esc(c.name)}"><span class="tapecard__ghost" aria-hidden="true">${esc(c.last)}</span></div>
+      <div class="tapecard__photo on-red"><span class="tapecard__ghost" aria-hidden="true">${esc(c.last || c.first)}</span><img src="${c.img}" width="820" height="951" alt="${esc(c.name)}"></div>
       <div class="tapecard__body">
         <header class="sheet__head sheet__head--flat"><div><p class="label">Tale of the tape</p><h2 class="h-l" id="coach-title">${esc(c.name)}</h2></div>
           <button class="iconbtn" type="button" data-action="overlay-close" aria-label="Close">${icon('x')}</button></header>
@@ -52,7 +52,7 @@ function renderCoachesPage() {
   const host = $('[data-coaches]'); if (!host) return;
   host.innerHTML = COACH_ORDER.map((id, i) => { const c = COACHES[id];
     return `<article class="coach ${i % 2 ? 'coach--flip' : ''}" id="coach-${id}">
-        <div class="coach__photo on-red"><span class="coach__ghost" aria-hidden="true">${esc(c.last)}</span><img src="${c.img}" width="820" height="951" loading="lazy" alt="${esc(c.name)}, ${esc(c.role)}"></div>
+        <div class="coach__photo on-red"><span class="coach__ghost" aria-hidden="true">${esc(c.last || c.first)}</span><img src="${c.img}" width="820" height="951" loading="lazy" alt="${esc(c.name)}, ${esc(c.role)}"></div>
         <div class="coach__body">
           <p class="label">${esc(c.role)}</p>
           <h2 class="h-l">${esc(c.name)}</h2>
