@@ -31,7 +31,7 @@ How the site works:
 These come from the old site, which disagreed with itself in places. Fix them in `src/js/00-data.js`, then rebuild (see section 5).
 
 1. **Hours.** The site uses Mon–Fri 6 AM–8 PM, Sat 8 AM–2 PM, Sunday closed. The old site also listed Mon–Thu 6 AM–9 PM with Fri 6 AM–7 PM, and a third set in its search data.
-2. **Kids Boxing.** The coach, age range and price aren't set yet. It is not on Mindbody, so it is reserved on the site (parent's details plus the child's name and age) and paid at the desk.
+2. **Kids Boxing.** Sam coaches Monday and Friday. The Wednesday coach, age range and price aren't set yet. It is not on Mindbody, so it is reserved on the site (parent's details plus the child's name and age) and paid at the desk.
 3. **Weekly schedule.** Times and coaches come from the gym's Mindbody calendar automatically (see "The live schedule" below). Kids Boxing and Saturday sparring aren't on Mindbody, so they're typed into `WEEK` in `00-data.js`; update those there.
 4. **Pass names and prices.** Mindbody's store uses names like "Boxing Classes (Without G.A)" and "Group Class + G.A". The site uses the old website's names, such as Group Boxing Unlimited and Boxing + General Access. Check the prices match, and check that the 3-for-$30 intro offer can be bought on Mindbody.
 5. **Offers.** Check that 3 classes for $30, 25% off packages for first-timers, and 10% off personal training packages are all still running.

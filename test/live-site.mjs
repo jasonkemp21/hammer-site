@@ -48,7 +48,7 @@ let configMode = 'set';
 // a fixed schedule from the Mindbody widget, as the daily job writes it: Mon Oct 26 is 'today' in the tests
 const FIXTURE = { source: 'mindbody-widget', fetched: '2026-10-26T10:15:00.000Z', from: '2026-10-26', to: '2026-11-01', types: ['Boxing', 'Hammer Hip House Boxing'], classes: [
   { date: '2026-10-26', start: '17:00', mins: 60, name: 'Boxing', coach: 'teijon Price', regular: null, cancelled: false, spots: 2, bookable: true },
-  { date: '2026-10-26', start: '18:00', mins: 60, name: 'Boxing', coach: 'Sam Smith', regular: null, cancelled: false, spots: 15, bookable: true },
+  { date: '2026-10-26', start: '18:00', mins: 60, name: 'Boxing', coach: 'Pat Rivera', regular: null, cancelled: false, spots: 15, bookable: true },
   { date: '2026-10-27', start: '07:00', mins: 60, name: 'Boxing', coach: 'teijon Price', regular: null, cancelled: false, spots: 13, bookable: true },
   { date: '2026-10-27', start: '12:00', mins: 60, name: 'Hammer Hip House Boxing', coach: 'Johnny Higgins', regular: null, cancelled: false, spots: 10, bookable: true },
   { date: '2026-10-27', start: '17:00', mins: 60, name: 'Boxing', coach: 'JJ Higgins', regular: null, cancelled: true, spots: 15, bookable: true },
@@ -124,12 +124,12 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
     check(/refresh every morning/.test(note) && /last checked/.test(note), 'schedule note says it comes from Mindbody and when it was checked');
     const cell = (sel) => page.locator(sel).evaluateAll((els) => els.map((e) => e.textContent.replace(/\s+/g, ' ')));
     const today = await cell('.week .week__cell.is-today .slot');
-    check(today.some((t) => /Final bell/i.test(t)) && today.some((t) => /Teijon/.test(t) && /2 left/.test(t)) && today.some((t) => /Sam Smith/.test(t)), 'today keeps its finished classes and shows live coaches and spots left', today.join(' || '));
+    check(today.some((t) => /Final bell/i.test(t)) && today.some((t) => /Teijon/.test(t) && /2 left/.test(t)) && today.some((t) => /Pat Rivera/.test(t)), 'today keeps its finished classes and shows live coaches and spots left', today.join(' || '));
     const tue = await page.locator('.week .week__cell').evaluateAll((els) => els.filter((e, i) => i % 7 === 1).flatMap((e) => [...e.querySelectorAll('.slot')].map((x) => x.textContent.replace(/\s+/g, ' '))));
     check(tue.some((t) => /Cancelled/.test(t)) && tue.some((t) => /Full/.test(t)) && tue.some((t) => /Muay Thai/i.test(t)), 'cancelled and full classes are marked; Muay Thai (not in the widget) still comes from the usual schedule', tue.join(' || '));
     check(await page.locator('.week .slot', { hasText: 'Open Ring Night' }).count() === 1 && await page.locator('.week__time', { hasText: '8 PM' }).count() === 1, 'a class the site never heard of gets its own row and card');
     const dayBouts = await cell('.weeklist .bout');
-    check(dayBouts.some((t) => /Sam Smith/.test(t) && /Coach/.test(t)), 'a coach the site does not know is shown by name');
+    check(dayBouts.some((t) => /Pat Rivera/.test(t) && /Coach/.test(t)), 'a coach the site does not know is shown by name');
     check(await page.locator('.week .slot--kids').count() === 3 && await page.locator('.week .slot--sparring').count() === 1, 'Kids Boxing and sparring (not on Mindbody) still appear alongside the live classes');
   }
 

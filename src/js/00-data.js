@@ -116,21 +116,22 @@ const COACHES = {
   },
   sam: {
     say: 'a boxing coach and Colorado Golden Gloves champion',
-    id: 'sam', name: 'Sam', first: 'Sam', last: '', role: 'Boxing coach',
+    id: 'sam', name: 'Sam Smith', first: 'Sam', last: 'Smith', role: 'Boxing coach · Personal trainer',
     img: 'img/coach-sam.webp', ava: 'img/ava-sam.webp',
     fact: 'Colorado Golden Gloves champion. Former college softball player.',
     tape: [
-      ['Corner', 'Boxing coach'],
+      ['Corner', 'Boxing coach, personal trainer'],
       ['Amateur', 'Colorado Golden Gloves champion'],
       ['Style', 'Technique first, with a Mexican style flair'],
       ['Background', 'College softball'],
-      ['Teaches', 'Boxing, private boxing'],
+      ['Certified', 'NASM personal trainer'],
+      ['Teaches', 'Group boxing, Kids Boxing'],
     ],
     bio: [
-      'Sam is an amateur boxer and Colorado Golden Gloves champion who coaches boxing with a focus on technique, with a Mexican style flair. Sessions pair technical work with conditioning, so clients improve as boxers while building strength and endurance.',
-      'Her athletic roots go back to college softball. Training as an athlete her whole life built the discipline and competitive drive she brings to every round in the ring. Whether you are lacing up gloves for the first time, sharpening your technique or getting ready for your first bout, Sam will coach you, push you and help you fall in love with boxing too.',
+      'Sam is an amateur boxer and Colorado Golden Gloves champion who coaches boxing with a focus on technique, with a Mexican style flair. Her classes pair technical work with conditioning, so clients improve as boxers while building strength and endurance.',
+      'Her athletic roots go back to college softball. Training as an athlete her whole life built the discipline and competitive drive she brings to every round in the ring. Whether you are lacing up gloves for the first time, sharpening your technique or getting ready for your first bout, Sam will coach you, push you and help you fall in love with boxing too. She is also a NASM-certified personal trainer.',
     ],
-    privates: ['boxing'],
+    privates: [],
   },
 };
 const COACH_ORDER = ['johnny', 'jj', 'lopez', 'tee', 'sam'];
@@ -157,7 +158,7 @@ const CLASS_TYPES = {
   // Mon, Wed, Fri 5 PM. Not on Mindbody: reserved on the site and paid at the desk. Coach, ages and price still to come from the gym
   kids: {
     id: 'kids', name: 'Kids Boxing', tag: 'kids', mins: 60, level: 'Kids', bookable: true, deskOnly: true, siteOnly: true,
-    blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM. Reserved through the front desk.',
+    blurb: 'Boxing for kids, Monday, Wednesday and Friday at 5 PM, with Sam on Monday and Friday. Reserved through the front desk.',
     noCoach: ['Hammer coaches', 'Reserve a spot, pay at the desk'],
   },
 };
@@ -166,11 +167,11 @@ const CLASS_TYPES = {
    The live site reads Mindbody every morning (docs/schedule.json) and uses this only for days Mindbody has not published yet.
    Kids Boxing and sparring are not on Mindbody, so they always come from here. */
 const WEEK = [
-  { day: 0, t: 420, type: 'boxing', coach: 'tee' }, { day: 0, t: 720, type: 'lunch', coach: 'johnny' }, { day: 0, t: 1020, type: 'boxing', coach: 'jj' }, { day: 0, t: 1080, type: 'boxing', coach: 'jj' }, { day: 0, t: 1020, type: 'kids', coach: null },
+  { day: 0, t: 420, type: 'boxing', coach: 'tee' }, { day: 0, t: 720, type: 'lunch', coach: 'johnny' }, { day: 0, t: 1020, type: 'boxing', coach: 'jj' }, { day: 0, t: 1080, type: 'boxing', coach: 'sam' }, { day: 0, t: 1020, type: 'kids', coach: 'sam' },
   { day: 1, t: 420, type: 'boxing', coach: 'tee' }, { day: 1, t: 720, type: 'lunch', coach: 'johnny' }, { day: 1, t: 1020, type: 'boxing', coach: 'jj' }, { day: 1, t: 1080, type: 'boxing', coach: 'jj' }, { day: 1, t: 1080, type: 'muaythai', coach: 'lopez' },
   { day: 2, t: 420, type: 'boxing', coach: 'tee' }, { day: 2, t: 720, type: 'lunch', coach: 'jj' }, { day: 2, t: 1020, type: 'boxing', coach: 'jj' }, { day: 2, t: 1080, type: 'boxing', coach: 'jj' }, { day: 2, t: 1020, type: 'kids', coach: null },
   { day: 3, t: 420, type: 'boxing', coach: 'tee' }, { day: 3, t: 720, type: 'lunch', coach: 'jj' }, { day: 3, t: 1020, type: 'boxing', coach: 'jj' }, { day: 3, t: 1080, type: 'boxing', coach: 'jj' }, { day: 3, t: 1080, type: 'muaythai', coach: 'lopez' },
-  { day: 4, t: 420, type: 'boxing', coach: 'tee' }, { day: 4, t: 720, type: 'lunch', coach: 'jj' }, { day: 4, t: 1020, type: 'boxing', coach: 'jj' }, { day: 4, t: 1080, type: 'boxing', coach: 'jj' }, { day: 4, t: 1020, type: 'kids', coach: null },
+  { day: 4, t: 420, type: 'boxing', coach: 'tee' }, { day: 4, t: 720, type: 'lunch', coach: 'jj' }, { day: 4, t: 1020, type: 'boxing', coach: 'jj' }, { day: 4, t: 1080, type: 'boxing', coach: 'sam' }, { day: 4, t: 1020, type: 'kids', coach: 'sam' },
   { day: 5, t: 600, type: 'boxing', coach: 'johnny' }, { day: 5, t: 660, type: 'sparring', coach: null },
 ];
 

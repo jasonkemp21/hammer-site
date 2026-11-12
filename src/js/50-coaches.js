@@ -32,7 +32,7 @@ function coachCtas(c) {
   const kind = c.privates[0];
   return `<div class="btn-row">
       <button class="btn btn--primary" type="button" data-action="coach-classes" data-id="${c.id}">Classes with ${esc(c.first)}</button>
-      <button class="btn btn--ghost" type="button" data-action="inquire" data-kind="${kind}" data-coach="${c.id}">Request a private</button>
+      ${kind ? `<button class="btn btn--ghost" type="button" data-action="inquire" data-kind="${kind}" data-coach="${c.id}">Request a private</button>` : ''}
     </div>`;
 }
 function renderCoachModal(id) {
