@@ -70,7 +70,7 @@ async function site(route) {
 }
 const opened = [];
 async function setup(ctx, opts = {}) {
-  if (!opts.offers) await ctx.addInitScript(() => { try { localStorage.setItem('hammer-offers-seen', String(Date.now())); } catch (e) {} }); // keep the welcome popup out of every other test
+  if (!opts.offers) await ctx.addInitScript(() => { try { sessionStorage.setItem('hammer-offers-seen', '1'); } catch (e) {} }); // keep the welcome popup out of every other test
   await ctx.route(ORIGIN + '/**', site);
   await ctx.route(SB + '/**', supabase);
   await ctx.route('https://*.supabase.co/**', (r) => { errors.push('test reached a real Supabase project: ' + r.request().url()); return r.abort(); });
@@ -311,7 +311,7 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   await page.click('[data-ov="book"] [data-action="overlay-close"]'); await page.waitForTimeout(300);
   // it stays away after being seen
   await page.reload(); await page.waitForTimeout(3600);
-  check(await page.locator('[data-ov="offers"]:not([hidden])').count() === 0, 'popup does not return on the next visit this week');
+  check(await page.locator('[data-ov="offers"]:not([hidden])').count() === 0, 'popup does not return on a reload within the same visit');
   // footer link reopens it, and 2 for 1 goes to the request form
   await page.locator('[data-action="offers-open"]').first().click(); await page.waitForTimeout(400);
   check(await page.locator('[data-ov="offers"]:not([hidden])').count() === 1, 'footer link reopens the offers');
@@ -323,6 +323,9 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   await page.click('[data-action="inq-send"]'); await page.waitForTimeout(500);
   const o = db.inserts[db.inserts.length - 1];
   check(o && o.kind === 'boxing' && /price of 1/.test(o.details.offer || ''), '2 for 1 request is saved with the offer', JSON.stringify(o && o.details));
+  // a fresh visit (new tab) shows it again
+  const again = await ctx.newPage(); await again.goto(ORIGIN + '/'); await again.waitForTimeout(3600);
+  check(await again.locator('[data-ov="offers"]:not([hidden])').count() === 1, 'popup shows again on the next visit');
   await ctx.close();
   // phone
   const pc = await browser.newContext({ viewport: { width: 390, height: 844 } }); await setup(pc, { offers: true });

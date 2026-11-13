@@ -145,12 +145,13 @@ html.is-locked { overflow: hidden; }
 /* ---- new-client offers popup ---- */
 .sheet--promo { width: min(820px, calc(100vw - 24px)); }
 .promo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.promo__card { display: grid; gap: 10px; align-content: start; padding: 20px 20px 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--red); }
+.promo__card { display: flex; flex-direction: column; gap: 10px; padding: 20px 20px 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--red); }
 .promo__big { display: flex; align-items: baseline; gap: 10px; font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: .8; margin-top: 4px; }
 .promo__big b { font-size: clamp(4.5rem, 11vw, 6.5rem); color: var(--ink); }
 .promo__big span { font-size: clamp(1.5rem, 3.4vw, 2.125rem); letter-spacing: .01em; }
 .promo__price { font: 900 clamp(1.75rem, 3.6vw, 2.375rem)/.95 var(--display); text-transform: uppercase; color: var(--red); }
 .promo__text { color: var(--mute); font-size: var(--t-small); line-height: 1.5; text-wrap: pretty; margin-bottom: 6px; }
+.promo__card .btn { margin-top: auto; }
 .promo__note { padding: 14px 16px; background: var(--surface); border-left: 5px solid var(--red); font-weight: 600; }
 @media (max-width: 640px) {
   .sheet--promo { width: 100%; }

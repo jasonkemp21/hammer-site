@@ -981,12 +981,13 @@ html.is-locked { overflow: hidden; }
 /* ---- new-client offers popup ---- */
 .sheet--promo { width: min(820px, calc(100vw - 24px)); }
 .promo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.promo__card { display: grid; gap: 10px; align-content: start; padding: 20px 20px 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--red); }
+.promo__card { display: flex; flex-direction: column; gap: 10px; padding: 20px 20px 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--red); }
 .promo__big { display: flex; align-items: baseline; gap: 10px; font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: .8; margin-top: 4px; }
 .promo__big b { font-size: clamp(4.5rem, 11vw, 6.5rem); color: var(--ink); }
 .promo__big span { font-size: clamp(1.5rem, 3.4vw, 2.125rem); letter-spacing: .01em; }
 .promo__price { font: 900 clamp(1.75rem, 3.6vw, 2.375rem)/.95 var(--display); text-transform: uppercase; color: var(--red); }
 .promo__text { color: var(--mute); font-size: var(--t-small); line-height: 1.5; text-wrap: pretty; margin-bottom: 6px; }
+.promo__card .btn { margin-top: auto; }
 .promo__note { padding: 14px 16px; background: var(--surface); border-left: 5px solid var(--red); font-weight: 600; }
 @media (max-width: 640px) {
   .sheet--promo { width: 100%; }
@@ -1675,7 +1676,7 @@ html.is-locked { overflow: hidden; }
       <h2 class="h-s">Booking and payments</h2>
       <p>Class booking, accounts and payments are handled by Mindbody, Inc. on its own pages, under <a class="link" href="https://www.mindbodyonline.com/company/legal/privacy-policy" target="_blank" rel="noopener">Mindbody's privacy policy</a>. This site never asks for or stores card details.</p>
       <h2 class="h-s">Cookies and storage</h2>
-      <p>This site does not use advertising or tracking cookies. The round timer remembers your settings in your own browser, and nothing about that leaves your device. The new-client offers window remembers in your browser that you have seen it, so it stays away for a week. Fonts are loaded from Google Fonts, which means Google receives your browser's standard request for them.</p>
+      <p>This site does not use advertising or tracking cookies. The round timer remembers your settings in your own browser, and nothing about that leaves your device. The new-client offers window notes in your browser tab that you have seen it, so it opens once per visit and the note is cleared when you close the tab. Fonts are loaded from Google Fonts, which means Google receives your browser's standard request for them.</p>
       <h2 class="h-s">Visitor statistics</h2>
       <p>We use Cloudflare Web Analytics to count visits and see which pages are viewed. It records the page, the site that sent you, and general details such as your country, browser and device type. It does not use cookies, does not store anything on your device and does not follow you across other websites. We use these numbers only to understand how the site is used.</p>
       <h2 class="h-s">Your choices</h2>
@@ -2803,15 +2804,15 @@ document.addEventListener('change', (e) => {
 // ---- 38-offers.js ----
 /* ---------- new-client offers popup: 3 classes for $30 and 2 private sessions for the price of 1 ---------- */
 const OFFERS_KEY = 'hammer-offers-seen';
-const OFFERS_QUIET_DAYS = 7;
 let offersShownThisVisit = false;
+// once per visit: sessionStorage survives a reload in the same tab but clears when the tab closes
 function offersRecentlySeen() {
   if (offersShownThisVisit) return true;
-  try { const t = +localStorage.getItem(OFFERS_KEY); return !!t && Date.now() - t < OFFERS_QUIET_DAYS * 864e5; } catch (e) { return false; }
+  try { return sessionStorage.getItem(OFFERS_KEY) === '1'; } catch (e) { return false; }
 }
 function markOffersSeen() {
   offersShownThisVisit = true;
-  try { localStorage.setItem(OFFERS_KEY, String(Date.now())); } catch (e) { /* storage blocked: the popup then shows once per page load */ }
+  try { sessionStorage.setItem(OFFERS_KEY, '1'); } catch (e) { /* storage blocked: the popup then shows once per page load */ }
 }
 function renderOffers() {
   const host = $('[data-offers]'); if (!host) return;

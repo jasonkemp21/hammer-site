@@ -1,14 +1,14 @@
 /* ---------- new-client offers popup: 3 classes for $30 and 2 private sessions for the price of 1 ---------- */
 const OFFERS_KEY = 'hammer-offers-seen';
-const OFFERS_QUIET_DAYS = 7;
 let offersShownThisVisit = false;
+// once per visit: sessionStorage survives a reload in the same tab but clears when the tab closes
 function offersRecentlySeen() {
   if (offersShownThisVisit) return true;
-  try { const t = +localStorage.getItem(OFFERS_KEY); return !!t && Date.now() - t < OFFERS_QUIET_DAYS * 864e5; } catch (e) { return false; }
+  try { return sessionStorage.getItem(OFFERS_KEY) === '1'; } catch (e) { return false; }
 }
 function markOffersSeen() {
   offersShownThisVisit = true;
-  try { localStorage.setItem(OFFERS_KEY, String(Date.now())); } catch (e) { /* storage blocked: the popup then shows once per page load */ }
+  try { sessionStorage.setItem(OFFERS_KEY, '1'); } catch (e) { /* storage blocked: the popup then shows once per page load */ }
 }
 function renderOffers() {
   const host = $('[data-offers]'); if (!host) return;
