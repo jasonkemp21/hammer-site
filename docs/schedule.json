@@ -1,57 +1,24 @@
 {
  "source": "mindbody-widget",
  "widget": "b667859216f",
- "fetched": "2026-11-12T18:20:29.715Z",
- "from": "2026-11-12",
- "to": "2026-11-19",
+ "fetched": "2026-11-13T17:45:27.095Z",
+ "from": "2026-11-13",
+ "to": "2026-11-20",
  "types": [
-  "Boxing",
-  "Hammer Hip House Boxing"
+  "Hammer Hip House Boxing",
+  "Boxing"
  ],
  "classes": [
-  {
-   "date": "2026-11-12",
-   "start": "17:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 13,
-   "bookable": true
-  },
-  {
-   "date": "2026-11-12",
-   "start": "18:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 14,
-   "bookable": true
-  },
-  {
-   "date": "2026-11-13",
-   "start": "07:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "teijon Price",
-   "regular": null,
-   "cancelled": false,
-   "spots": 13,
-   "bookable": true
-  },
   {
    "date": "2026-11-13",
    "start": "12:00",
    "mins": 60,
    "name": "Hammer Hip House Boxing",
-   "coach": "JJ Higgins",
+   "coach": "Johnny Higgins",
    "regular": null,
    "cancelled": false,
-   "spots": 10,
-   "bookable": true
+   "spots": 9,
+   "bookable": false
   },
   {
    "date": "2026-11-13",
@@ -61,7 +28,7 @@
    "coach": "JJ Higgins",
    "regular": null,
    "cancelled": false,
-   "spots": 14,
+   "spots": 13,
    "bookable": true
   },
   {
@@ -69,10 +36,10 @@
    "start": "18:00",
    "mins": 60,
    "name": "Boxing",
-   "coach": "JJ Higgins",
+   "coach": "Sam Smith",
    "regular": null,
    "cancelled": false,
-   "spots": 15,
+   "spots": 14,
    "bookable": true
   },
   {
@@ -83,7 +50,7 @@
    "coach": "Johnny Higgins",
    "regular": null,
    "cancelled": false,
-   "spots": 13,
+   "spots": 14,
    "bookable": true
   },
   {
@@ -171,7 +138,7 @@
    "coach": "JJ Higgins",
    "regular": null,
    "cancelled": false,
-   "spots": 15,
+   "spots": 14,
    "bookable": true
   },
   {
@@ -193,7 +160,7 @@
    "coach": "Johnny Higgins",
    "regular": null,
    "cancelled": false,
-   "spots": 10,
+   "spots": 9,
    "bookable": true
   },
   {
@@ -237,7 +204,7 @@
    "coach": "Johnny Higgins",
    "regular": null,
    "cancelled": false,
-   "spots": 10,
+   "spots": 9,
    "bookable": true
   },
   {
@@ -253,6 +220,50 @@
   },
   {
    "date": "2026-11-19",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-20",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-20",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 9,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-20",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-11-20",
    "start": "18:00",
    "mins": 60,
    "name": "Boxing",
