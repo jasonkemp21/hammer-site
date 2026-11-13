@@ -26,7 +26,7 @@ function validateContact(form, target) {
 
 /* ---------- request a private session, personal training, Kids Boxing, or a talk about competing ---------- */
 const INQ_KINDS = { boxing: 'Private boxing', muaythai: 'Private Muay Thai', pt: 'Personal training', compete: 'Sparring and competing', kids: 'Kids boxing' };
-const Inquiry = { kind: 'boxing', coach: 'any', pack: 5, times: [], form: { first: '', last: '', email: '', phone: '', note: '' }, errors: {}, done: false, sending: false, failed: false };
+const Inquiry = { kind: 'boxing', offer: false, coach: 'any', pack: 5, times: [], form: { first: '', last: '', email: '', phone: '', note: '' }, errors: {}, done: false, sending: false, failed: false };
 
 function renderInquiry() {
   const host = $('[data-inquire]'); if (!host) return; const q = Inquiry;
@@ -44,13 +44,13 @@ function renderInquiry() {
   const coachOpts = `<option value="any" ${q.coach === 'any' ? 'selected' : ''}>No preference</option>` + who.map((id) => `<option value="${id}" ${q.coach === id ? 'selected' : ''}>${esc(COACHES[id].name)}</option>`).join('');
   const table = q.kind === 'pt' ? ONE_ON_ONE.pt : ONE_ON_ONE.boxing;
   const groupAsk = q.kind === 'compete' || q.kind === 'kids';
-  const packs = groupAsk ? '' : `<div class="field field--full"><span class="field__label">Sessions you are thinking about</span><div class="chips">${table.tiers.map(([n, total]) =>
+  const packs = (groupAsk || q.offer) ? '' : `<div class="field field--full"><span class="field__label">Sessions you are thinking about</span><div class="chips">${table.tiers.map(([n, total]) =>
     `<button class="chip" type="button" aria-pressed="${q.pack === n}" data-action="inq-pack" data-n="${n}">${n === 1 ? 'Single' : n + ' pack'} · ${money(total)}</button>`).join('')}</div>
     ${q.kind === 'muaythai' ? '<span class="small muted">Private boxing rates shown. Ask the desk for Muay Thai rates.</span>' : ''}</div>`;
   const times = ['Mornings', 'Midday', 'Evenings', 'Saturday'].map((t) => `<button class="chip" type="button" aria-pressed="${q.times.includes(t)}" data-action="inq-time" data-id="${t}">${t}</button>`).join('');
   const e = q.errors;
-  host.innerHTML = sheetHead(q.kind === 'kids' ? 'Kids Boxing' : 'One-on-one', q.kind === 'compete' ? 'Talk to Johnny' : q.kind === 'kids' ? 'Ask about Kids Boxing' : 'Request a session', 'inq-title') + `<form class="sheet__body" data-form="inquiry" novalidate>
-      <div class="field"><span class="field__label">What are you after?</span><div class="chips">${kinds}</div></div>
+  host.innerHTML = sheetHead(q.offer ? 'New client offer' : q.kind === 'kids' ? 'Kids Boxing' : 'One-on-one', q.offer ? '2 sessions for the price of 1' : q.kind === 'compete' ? 'Talk to Johnny' : q.kind === 'kids' ? 'Ask about Kids Boxing' : 'Request a session', 'inq-title') + `<form class="sheet__body" data-form="inquiry" novalidate>
+      ${q.offer ? '<p class="promo__note">Two private boxing sessions for the price of one. Tell us when you can train and a coach will reach out.</p>' : `<div class="field"><span class="field__label">What are you after?</span><div class="chips">${kinds}</div></div>`}
       <div class="form-grid">
         ${q.kind === 'kids' ? '' : `<div class="field"><label for="inq-coach">Coach</label><select class="select" id="inq-coach">${coachOpts}</select></div>
         <div class="field"><span class="field__label">Best times</span><div class="chips">${times}</div></div>`}
@@ -62,7 +62,7 @@ function renderInquiry() {
         <div class="field field--full"><label for="inq-note">Anything we should know? <span class="muted">(optional)</span></label><textarea class="textarea" id="inq-note" maxlength="4000" placeholder="${q.kind === 'kids' ? 'Your child’s age and any boxing experience' : 'Goals, experience, schedule'}">${esc(q.form.note)}</textarea></div>
       </div>
       ${honeypot()}
-      ${q.kind === 'kids' ? '<p class="small muted">Kids Boxing runs Monday, Wednesday and Friday at 5 PM.</p>' : '<p class="small muted">24-hour notice to cancel or move a session. Packages expire after 90 days. First-time clients get 25% off packages.</p>'}
+      ${q.offer ? '<p class="small muted">For new clients. 24-hour notice to cancel or move a session.</p>' : q.kind === 'kids' ? '<p class="small muted">Kids Boxing runs Monday, Wednesday and Friday at 5 PM.</p>' : '<p class="small muted">24-hour notice to cancel or move a session. Packages expire after 90 days. First-time clients get 25% off packages.</p>'}
       ${q.failed ? sendFailed() : ''}
     </form>
     <footer class="sheet__foot"><span class="small muted">Prefer to talk? ${GYM.phone}</span><button class="btn btn--primary" type="button" data-action="inq-send" ${q.sending ? 'disabled' : ''}>${q.sending ? 'Sending…' : 'Send request'}</button></footer>`;
@@ -75,6 +75,7 @@ function readInquiry() {
 Object.assign(actions, {
   'inquire': (el) => {
     const q = Inquiry; q.done = false; q.failed = false; q.sending = false; q.errors = {};
+    q.offer = !!(el && el.dataset.offer);
     if (el && el.dataset.kind) q.kind = el.dataset.kind;
     q.coach = (el && el.dataset.coach) || 'any';
     if ($('#menu') && !$('#menu').hidden) actions['menu-close']();
@@ -90,7 +91,8 @@ Object.assign(actions, {
     const f = q.form; const group = q.kind === 'compete' || q.kind === 'kids';
     const details = { request: INQ_KINDS[q.kind] };
     if (q.kind !== 'kids') { details.coach = q.coach === 'any' ? 'No preference' : COACHES[q.coach].name; details.best_times = q.times.length ? q.times.join(', ') : 'Not given'; }
-    if (!group) details.sessions = q.pack === 1 ? 'Single session' : q.pack + ' sessions';
+    if (q.offer) { details.offer = '2 private sessions for the price of 1'; details.sessions = '2 sessions for the price of 1'; }
+    else if (!group) details.sessions = q.pack === 1 ? 'Single session' : q.pack + ' sessions';
     const trap = trapValue('[data-ov="inquire"]');
     q.sending = true; q.failed = false; renderInquiry();
     const ok = await sendRequest(q.kind, { name: `${f.first.trim()} ${f.last.trim()}`, email: f.email, phone: f.phone, message: f.note }, details, trap);

@@ -69,7 +69,8 @@ async function site(route) {
   return route.fulfill({ status: 404, contentType: 'text/html', body: fs.readFileSync(path.join(dist, '404.html')) });
 }
 const opened = [];
-async function setup(ctx) {
+async function setup(ctx, opts = {}) {
+  if (!opts.offers) await ctx.addInitScript(() => { try { localStorage.setItem('hammer-offers-seen', String(Date.now())); } catch (e) {} }); // keep the welcome popup out of every other test
   await ctx.route(ORIGIN + '/**', site);
   await ctx.route(SB + '/**', supabase);
   await ctx.route('https://*.supabase.co/**', (r) => { errors.push('test reached a real Supabase project: ' + r.request().url()); return r.abort(); });
@@ -289,6 +290,51 @@ for (const [vw, vh, tag] of [[1440, 900, 'desk'], [390, 844, 'phone']]) {
   check(over <= 1, 'admin fits a phone screen');
   await page.screenshot({ path: `${out}/admin-phone.png`, fullPage: true });
   await ctx.close();
+}
+
+// ================= new-client offers popup =================
+{
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 } }); await setup(ctx, { offers: true });
+  const page = await ctx.newPage(); watch(page, 'offers');
+  await page.goto(ORIGIN + '/'); await page.waitForTimeout(1500);
+  check(await page.locator('[data-ov="offers"]:not([hidden])').count() === 0, 'offers popup waits a moment before appearing');
+  await page.waitForTimeout(2200);
+  const pop = page.locator('[data-ov="offers"]:not([hidden])');
+  check(await pop.count() === 1, 'offers popup appears on arrival');
+  const txt = await pop.innerText();
+  check(/3\s*classes/i.test(txt) && /\$30/.test(txt) && /2\s*sessions/i.test(txt) && /price of 1/i.test(txt), 'popup shows both offers', txt.replace(/\s+/g, ' '));
+  await page.screenshot({ path: `${out}/offers-desktop.png` });
+  // 3 for $30 opens the pass reservation
+  await page.click('[data-action="offer-intro"]'); await page.waitForTimeout(500);
+  check(await page.locator('[data-ov="book"]:not([hidden])').count() === 1 && /\$30|3 classes|intro/i.test(await page.locator('[data-ov="book"]').innerText()), 'Claim 3 for $30 opens the pass reservation');
+  await page.screenshot({ path: `${out}/offers-intro-book.png` });
+  await page.click('[data-ov="book"] [data-action="overlay-close"]'); await page.waitForTimeout(300);
+  // it stays away after being seen
+  await page.reload(); await page.waitForTimeout(3600);
+  check(await page.locator('[data-ov="offers"]:not([hidden])').count() === 0, 'popup does not return on the next visit this week');
+  // footer link reopens it, and 2 for 1 goes to the request form
+  await page.locator('[data-action="offers-open"]').first().click(); await page.waitForTimeout(400);
+  check(await page.locator('[data-ov="offers"]:not([hidden])').count() === 1, 'footer link reopens the offers');
+  await page.click('[data-action="offer-private"]'); await page.waitForTimeout(500);
+  const inq = page.locator('[data-ov="inquire"]:not([hidden])');
+  check(await inq.count() === 1 && /2 sessions for the price of 1/i.test(await inq.innerText()), 'Request 2 for 1 opens the private request form');
+  await page.screenshot({ path: `${out}/offers-inquiry.png` });
+  await page.fill('#inq-fn', 'Lee'); await page.fill('#inq-ln', 'Park'); await page.fill('#inq-em', 'lee@example.com');
+  await page.click('[data-action="inq-send"]'); await page.waitForTimeout(500);
+  const o = db.inserts[db.inserts.length - 1];
+  check(o && o.kind === 'boxing' && /price of 1/.test(o.details.offer || ''), '2 for 1 request is saved with the offer', JSON.stringify(o && o.details));
+  await ctx.close();
+  // phone
+  const pc = await browser.newContext({ viewport: { width: 390, height: 844 } }); await setup(pc, { offers: true });
+  const pp = await pc.newPage(); watch(pp, 'offers-phone');
+  await pp.goto(ORIGIN + '/'); await pp.waitForTimeout(3600);
+  check(await pp.locator('[data-ov="offers"]:not([hidden])').count() === 1, 'popup appears on a phone');
+  const box = await pp.locator('[data-ov="offers"]').boundingBox();
+  check(box && box.x >= 0 && box.x + box.width <= 391 && box.y >= 0 && box.y + box.height <= 845, 'popup fits a phone screen', JSON.stringify(box));
+  await pp.screenshot({ path: `${out}/offers-phone.png` });
+  await pp.keyboard.press('Escape'); await pp.waitForTimeout(300);
+  check(await pp.locator('[data-ov="offers"]:not([hidden])').count() === 0, 'Escape closes the popup');
+  await pc.close();
 }
 
 // ================= old addresses forward =================

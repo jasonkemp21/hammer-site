@@ -978,6 +978,24 @@ html.is-locked { overflow: hidden; }
 .way small .i { width: 1.1em; height: 1.1em; }
 .recap .link { margin-left: auto; }
 
+/* ---- new-client offers popup ---- */
+.sheet--promo { width: min(820px, calc(100vw - 24px)); }
+.promo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.promo__card { display: grid; gap: 10px; align-content: start; padding: 20px 20px 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--red); }
+.promo__big { display: flex; align-items: baseline; gap: 10px; font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: .8; margin-top: 4px; }
+.promo__big b { font-size: clamp(4.5rem, 11vw, 6.5rem); color: var(--ink); }
+.promo__big span { font-size: clamp(1.5rem, 3.4vw, 2.125rem); letter-spacing: .01em; }
+.promo__price { font: 900 clamp(1.75rem, 3.6vw, 2.375rem)/.95 var(--display); text-transform: uppercase; color: var(--red); }
+.promo__text { color: var(--mute); font-size: var(--t-small); line-height: 1.5; text-wrap: pretty; margin-bottom: 6px; }
+.promo__note { padding: 14px 16px; background: var(--surface); border-left: 5px solid var(--red); font-weight: 600; }
+@media (max-width: 640px) {
+  .sheet--promo { width: 100%; }
+  .promo { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .promo__card { padding: 16px 16px 18px; gap: 8px; }
+  .promo__big b { font-size: 4.25rem; }
+  .promo__text { display: none; }
+}
+
 /* ================= ROUND TIMER ================= */
 .timer { --ring: var(--red); }
 .timer__face { position: relative; width: min(100%, 440px); aspect-ratio: 1; margin-inline: auto; }
@@ -1657,7 +1675,7 @@ html.is-locked { overflow: hidden; }
       <h2 class="h-s">Booking and payments</h2>
       <p>Class booking, accounts and payments are handled by Mindbody, Inc. on its own pages, under <a class="link" href="https://www.mindbodyonline.com/company/legal/privacy-policy" target="_blank" rel="noopener">Mindbody's privacy policy</a>. This site never asks for or stores card details.</p>
       <h2 class="h-s">Cookies and storage</h2>
-      <p>This site does not use advertising or tracking cookies. The round timer remembers your settings in your own browser, and nothing about that leaves your device. Fonts are loaded from Google Fonts, which means Google receives your browser's standard request for them.</p>
+      <p>This site does not use advertising or tracking cookies. The round timer remembers your settings in your own browser, and nothing about that leaves your device. The new-client offers window remembers in your browser that you have seen it, so it stays away for a week. Fonts are loaded from Google Fonts, which means Google receives your browser's standard request for them.</p>
       <h2 class="h-s">Visitor statistics</h2>
       <p>We use Cloudflare Web Analytics to count visits and see which pages are viewed. It records the page, the site that sent you, and general details such as your country, browser and device type. It does not use cookies, does not store anything on your device and does not follow you across other websites. We use these numbers only to understand how the site is used.</p>
       <h2 class="h-s">Your choices</h2>
@@ -1688,6 +1706,7 @@ html.is-locked { overflow: hidden; }
         <a href="#pricing" data-route="pricing">Pricing</a>
         <a href="#coaches" data-route="coaches">Coaches</a>
         <a href="#train" data-route="train">Round timer</a>
+        <button class="foot__link" type="button" data-action="offers-open">New client offers</button>
       </div>
     </div>
     <div>
@@ -1727,6 +1746,7 @@ html.is-locked { overflow: hidden; }
 <!-- centered sheets -->
 <div class="sheet on-paper" data-ov="book" role="dialog" aria-modal="true" aria-labelledby="book-title" hidden><div class="sheet__in" data-reserve></div></div>
 <div class="sheet on-paper" data-ov="quiz" role="dialog" aria-modal="true" aria-labelledby="quiz-title" hidden><div class="sheet__in" data-quiz></div></div>
+<div class="sheet sheet--promo on-paper" data-ov="offers" role="dialog" aria-modal="true" aria-labelledby="offers-title" hidden><div class="sheet__in" data-offers></div></div>
 <div class="sheet on-paper" data-ov="inquire" role="dialog" aria-modal="true" aria-labelledby="inq-title" hidden><div class="sheet__in" data-inquire></div></div>
 <div class="sheet sheet--wide on-paper" data-ov="coach" role="dialog" aria-modal="true" aria-labelledby="coach-title" hidden><div class="sheet__in" data-coachcard></div></div>
 
@@ -2509,7 +2529,7 @@ function validateContact(form, target) {
 
 /* ---------- request a private session, personal training, Kids Boxing, or a talk about competing ---------- */
 const INQ_KINDS = { boxing: 'Private boxing', muaythai: 'Private Muay Thai', pt: 'Personal training', compete: 'Sparring and competing', kids: 'Kids boxing' };
-const Inquiry = { kind: 'boxing', coach: 'any', pack: 5, times: [], form: { first: '', last: '', email: '', phone: '', note: '' }, errors: {}, done: false, sending: false, failed: false };
+const Inquiry = { kind: 'boxing', offer: false, coach: 'any', pack: 5, times: [], form: { first: '', last: '', email: '', phone: '', note: '' }, errors: {}, done: false, sending: false, failed: false };
 
 function renderInquiry() {
   const host = $('[data-inquire]'); if (!host) return; const q = Inquiry;
@@ -2527,13 +2547,13 @@ function renderInquiry() {
   const coachOpts = `<option value="any" ${q.coach === 'any' ? 'selected' : ''}>No preference</option>` + who.map((id) => `<option value="${id}" ${q.coach === id ? 'selected' : ''}>${esc(COACHES[id].name)}</option>`).join('');
   const table = q.kind === 'pt' ? ONE_ON_ONE.pt : ONE_ON_ONE.boxing;
   const groupAsk = q.kind === 'compete' || q.kind === 'kids';
-  const packs = groupAsk ? '' : `<div class="field field--full"><span class="field__label">Sessions you are thinking about</span><div class="chips">${table.tiers.map(([n, total]) =>
+  const packs = (groupAsk || q.offer) ? '' : `<div class="field field--full"><span class="field__label">Sessions you are thinking about</span><div class="chips">${table.tiers.map(([n, total]) =>
     `<button class="chip" type="button" aria-pressed="${q.pack === n}" data-action="inq-pack" data-n="${n}">${n === 1 ? 'Single' : n + ' pack'} · ${money(total)}</button>`).join('')}</div>
     ${q.kind === 'muaythai' ? '<span class="small muted">Private boxing rates shown. Ask the desk for Muay Thai rates.</span>' : ''}</div>`;
   const times = ['Mornings', 'Midday', 'Evenings', 'Saturday'].map((t) => `<button class="chip" type="button" aria-pressed="${q.times.includes(t)}" data-action="inq-time" data-id="${t}">${t}</button>`).join('');
   const e = q.errors;
-  host.innerHTML = sheetHead(q.kind === 'kids' ? 'Kids Boxing' : 'One-on-one', q.kind === 'compete' ? 'Talk to Johnny' : q.kind === 'kids' ? 'Ask about Kids Boxing' : 'Request a session', 'inq-title') + `<form class="sheet__body" data-form="inquiry" novalidate>
-      <div class="field"><span class="field__label">What are you after?</span><div class="chips">${kinds}</div></div>
+  host.innerHTML = sheetHead(q.offer ? 'New client offer' : q.kind === 'kids' ? 'Kids Boxing' : 'One-on-one', q.offer ? '2 sessions for the price of 1' : q.kind === 'compete' ? 'Talk to Johnny' : q.kind === 'kids' ? 'Ask about Kids Boxing' : 'Request a session', 'inq-title') + `<form class="sheet__body" data-form="inquiry" novalidate>
+      ${q.offer ? '<p class="promo__note">Two private boxing sessions for the price of one. Tell us when you can train and a coach will reach out.</p>' : `<div class="field"><span class="field__label">What are you after?</span><div class="chips">${kinds}</div></div>`}
       <div class="form-grid">
         ${q.kind === 'kids' ? '' : `<div class="field"><label for="inq-coach">Coach</label><select class="select" id="inq-coach">${coachOpts}</select></div>
         <div class="field"><span class="field__label">Best times</span><div class="chips">${times}</div></div>`}
@@ -2545,7 +2565,7 @@ function renderInquiry() {
         <div class="field field--full"><label for="inq-note">Anything we should know? <span class="muted">(optional)</span></label><textarea class="textarea" id="inq-note" maxlength="4000" placeholder="${q.kind === 'kids' ? 'Your child’s age and any boxing experience' : 'Goals, experience, schedule'}">${esc(q.form.note)}</textarea></div>
       </div>
       ${honeypot()}
-      ${q.kind === 'kids' ? '<p class="small muted">Kids Boxing runs Monday, Wednesday and Friday at 5 PM.</p>' : '<p class="small muted">24-hour notice to cancel or move a session. Packages expire after 90 days. First-time clients get 25% off packages.</p>'}
+      ${q.offer ? '<p class="small muted">For new clients. 24-hour notice to cancel or move a session.</p>' : q.kind === 'kids' ? '<p class="small muted">Kids Boxing runs Monday, Wednesday and Friday at 5 PM.</p>' : '<p class="small muted">24-hour notice to cancel or move a session. Packages expire after 90 days. First-time clients get 25% off packages.</p>'}
       ${q.failed ? sendFailed() : ''}
     </form>
     <footer class="sheet__foot"><span class="small muted">Prefer to talk? ${GYM.phone}</span><button class="btn btn--primary" type="button" data-action="inq-send" ${q.sending ? 'disabled' : ''}>${q.sending ? 'Sending…' : 'Send request'}</button></footer>`;
@@ -2558,6 +2578,7 @@ function readInquiry() {
 Object.assign(actions, {
   'inquire': (el) => {
     const q = Inquiry; q.done = false; q.failed = false; q.sending = false; q.errors = {};
+    q.offer = !!(el && el.dataset.offer);
     if (el && el.dataset.kind) q.kind = el.dataset.kind;
     q.coach = (el && el.dataset.coach) || 'any';
     if ($('#menu') && !$('#menu').hidden) actions['menu-close']();
@@ -2573,7 +2594,8 @@ Object.assign(actions, {
     const f = q.form; const group = q.kind === 'compete' || q.kind === 'kids';
     const details = { request: INQ_KINDS[q.kind] };
     if (q.kind !== 'kids') { details.coach = q.coach === 'any' ? 'No preference' : COACHES[q.coach].name; details.best_times = q.times.length ? q.times.join(', ') : 'Not given'; }
-    if (!group) details.sessions = q.pack === 1 ? 'Single session' : q.pack + ' sessions';
+    if (q.offer) { details.offer = '2 private sessions for the price of 1'; details.sessions = '2 sessions for the price of 1'; }
+    else if (!group) details.sessions = q.pack === 1 ? 'Single session' : q.pack + ' sessions';
     const trap = trapValue('[data-ov="inquire"]');
     q.sending = true; q.failed = false; renderInquiry();
     const ok = await sendRequest(q.kind, { name: `${f.first.trim()} ${f.last.trim()}`, email: f.email, phone: f.phone, message: f.note }, details, trap);
@@ -2776,6 +2798,63 @@ Object.assign(actions, {
 document.addEventListener('change', (e) => {
   const t = e.target;
   if (t.name === 'rv-class') { Reserve.key = t.value; renderReserve(); const again = $(`input[name="rv-class"][value="${t.value}"]`); if (again) again.focus(); }
+});
+
+// ---- 38-offers.js ----
+/* ---------- new-client offers popup: 3 classes for $30 and 2 private sessions for the price of 1 ---------- */
+const OFFERS_KEY = 'hammer-offers-seen';
+const OFFERS_QUIET_DAYS = 7;
+let offersShownThisVisit = false;
+function offersRecentlySeen() {
+  if (offersShownThisVisit) return true;
+  try { const t = +localStorage.getItem(OFFERS_KEY); return !!t && Date.now() - t < OFFERS_QUIET_DAYS * 864e5; } catch (e) { return false; }
+}
+function markOffersSeen() {
+  offersShownThisVisit = true;
+  try { localStorage.setItem(OFFERS_KEY, String(Date.now())); } catch (e) { /* storage blocked: the popup then shows once per page load */ }
+}
+function renderOffers() {
+  const host = $('[data-offers]'); if (!host) return;
+  const intro = PASSES.intro;
+  host.innerHTML = `<header class="sheet__head sheet__head--done on-red"><div><p class="label">New to Hammer?</p><h2 class="h-m" id="offers-title">Start for less</h2></div>
+      <button class="iconbtn" type="button" data-action="overlay-close" aria-label="Close">${icon('x')}</button></header>
+    <div class="sheet__body">
+      <div class="promo">
+        <article class="promo__card">
+          <p class="label">Group boxing</p>
+          <p class="promo__big"><b>${intro.classes}</b><span>classes</span></p>
+          <p class="promo__price">for ${money(intro.price)}</p>
+          <p class="promo__text">Try the real thing. Take any three group classes on the schedule and see what the Hammer way feels like.</p>
+          <button class="btn btn--primary btn--block" type="button" data-action="offer-intro" data-autofocus>Claim 3 for ${money(intro.price)} ${icon('go', 'i--go')}</button>
+        </article>
+        <article class="promo__card">
+          <p class="label">Private boxing</p>
+          <p class="promo__big"><b>2</b><span>sessions</span></p>
+          <p class="promo__price">for the price of 1</p>
+          <p class="promo__text">One-on-one with a Hammer coach, built around you. Send a request and we will reach out to set your first session.</p>
+          <button class="btn btn--primary btn--block" type="button" data-action="offer-private">Request 2 for 1 ${icon('go', 'i--go')}</button>
+        </article>
+      </div>
+      <p class="small muted">Both offers are for new clients.</p>
+    </div>
+    <footer class="sheet__foot"><span class="small muted">Questions? Call <a class="link" href="${GYM.tel}">${GYM.phone}</a></span><button class="btn btn--ghost" type="button" data-action="overlay-close">Maybe later</button></footer>`;
+}
+function openOffers() {
+  if ($('#menu') && !$('#menu').hidden) actions['menu-close'](true);
+  renderOffers(); markOffersSeen(); Overlay.open('offers');
+}
+/* shows once, a few seconds after arrival, and not again for a week; never on top of something the visitor already opened */
+function scheduleOffers() {
+  if (offersRecentlySeen()) return;
+  setTimeout(() => {
+    if (offersRecentlySeen() || document.hidden || Overlay.current || ($('#menu') && !$('#menu').hidden)) return;
+    openOffers();
+  }, 3000);
+}
+Object.assign(actions, {
+  'offers-open': () => openOffers(),
+  'offer-intro': () => openReserve('item', { item: 'intro' }),
+  'offer-private': () => actions['inquire']({ dataset: { kind: 'boxing', offer: 'twofer' } }),
 });
 
 // ---- 40-pricing.js ----
@@ -3641,6 +3720,7 @@ function start() {
   go(saved.route || routeFromHash(), null, true);
   setInterval(tick, 1000);
   loadLiveSchedule();
+  scheduleOffers();
 }
 /* docs/schedule.json is rewritten every morning by the GitHub job; one request a day per visitor is cached by the browser */
 function loadLiveSchedule() {

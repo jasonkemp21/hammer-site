@@ -231,6 +231,7 @@ function start() {
   go(saved.route || routeFromHash(), null, true);
   setInterval(tick, 1000);
   loadLiveSchedule();
+  scheduleOffers();
 }
 /* docs/schedule.json is rewritten every morning by the GitHub job; one request a day per visitor is cached by the browser */
 function loadLiveSchedule() {
