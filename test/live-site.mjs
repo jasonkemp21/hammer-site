@@ -73,6 +73,8 @@ async function setup(ctx) {
   await ctx.route(ORIGIN + '/**', site);
   await ctx.route(SB + '/**', supabase);
   await ctx.route('https://*.supabase.co/**', (r) => { errors.push('test reached a real Supabase project: ' + r.request().url()); return r.abort(); });
+  await ctx.route('https://static.cloudflareinsights.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' })); // keep test visits out of the real analytics
+  await ctx.route('https://cloudflareinsights.com/**', (r) => r.fulfill({ status: 204, body: '' }));
   await ctx.route('https://clients.mindbodyonline.com/**', (r) => { opened.push(r.request().url()); return r.fulfill({ status: 200, contentType: 'text/html', body: '<p>Mindbody stand-in</p>' }); });
 }
 
