@@ -1,67 +1,23 @@
 {
  "source": "mindbody-widget",
  "widget": "b667859216f",
- "fetched": "2026-11-24T20:40:56.093Z",
- "from": "2026-11-24",
- "to": "2026-12-01",
+ "fetched": "2026-11-25T19:56:57.241Z",
+ "from": "2026-11-25",
+ "to": "2026-12-02",
  "types": [
   "Boxing",
   "Hammer Hip House Boxing"
  ],
  "classes": [
   {
-   "date": "2026-11-24",
+   "date": "2026-11-25",
    "start": "17:00",
    "mins": 60,
    "name": "Boxing",
    "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 13,
-   "bookable": true
-  },
-  {
-   "date": "2026-11-24",
-   "start": "18:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 11,
-   "bookable": true
-  },
-  {
-   "date": "2026-11-25",
-   "start": "07:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "teijon Price",
    "regular": null,
    "cancelled": false,
    "spots": 14,
-   "bookable": true
-  },
-  {
-   "date": "2026-11-25",
-   "start": "12:00",
-   "mins": 60,
-   "name": "Hammer Hip House Boxing",
-   "coach": "Johnny Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 8,
-   "bookable": true
-  },
-  {
-   "date": "2026-11-25",
-   "start": "17:00",
-   "mins": 60,
-   "name": "Boxing",
-   "coach": "JJ Higgins",
-   "regular": null,
-   "cancelled": false,
-   "spots": 15,
    "bookable": true
   },
   {
@@ -253,6 +209,50 @@
   },
   {
    "date": "2026-12-01",
+   "start": "18:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-12-02",
+   "start": "07:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "teijon Price",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-12-02",
+   "start": "12:00",
+   "mins": 60,
+   "name": "Hammer Hip House Boxing",
+   "coach": "Johnny Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 10,
+   "bookable": true
+  },
+  {
+   "date": "2026-12-02",
+   "start": "17:00",
+   "mins": 60,
+   "name": "Boxing",
+   "coach": "JJ Higgins",
+   "regular": null,
+   "cancelled": false,
+   "spots": 15,
+   "bookable": true
+  },
+  {
+   "date": "2026-12-02",
    "start": "18:00",
    "mins": 60,
    "name": "Boxing",
